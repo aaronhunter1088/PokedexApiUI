@@ -1,6 +1,8 @@
-# Pokedexapiui
+# PokedexApiUI
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 15.0.2.
+This project works specifically with the PokedexApi project. This is the front end
+of the application while the PokedexApi is the back end.
 
 ## Development server
 
