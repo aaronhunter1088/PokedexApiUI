@@ -21,7 +21,7 @@ export class PokedexApiService extends PokemonService {
       limit: _limit ? _limit : 10,
       offset: _offset ? _offset : 0
     }
-    return this.http.get('http://localhost:8080/pokemon', { params: interval }).pipe(
+    return this.http.get('http://localhost:8080/pokedex/pokemon', { params: interval }).pipe(
       map((response: any) => response)
     );
   }
