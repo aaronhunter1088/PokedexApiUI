@@ -47,6 +47,7 @@ export class PokemonService {
   }
 
   callURL(url: any) {
+    console.log("url: ", url);
     return this.http.get(url);
   }
 
