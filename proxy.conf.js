@@ -4,7 +4,7 @@ console.log('[proxy] LOADED FILE:', __filename);
  *
  * - Routes /pokedexapi/** to the backend API on port 4202
  * - Used only during local development
- * - Eliminates CORS issues by keeping requests same-origin (4200)
+ * - Eliminates CORS issues by keeping requests same-origin (4203)
  */
 const mode = (process.env.POKEDEX_PROXY || 'dev').trim().toLowerCase();
 const useProd = mode === 'prod';
