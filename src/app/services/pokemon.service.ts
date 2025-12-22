@@ -32,7 +32,7 @@ export class PokemonService {
         return this.servicePokedex.getPokemonByName(pokemonName);
     }
 
-    getPokemonSpecies(speciesURL: string) { // speciesURL: string
+    getPokemonSpecies(speciesURL: string) {
         return this.callURL(speciesURL);
     }
 
@@ -50,7 +50,7 @@ export class PokemonService {
         if (url.startsWith(prodBase)) {
             console.debug("Converting production URL to local API URL");
             url = this.apiUrl + url.split(prodBase)[1]; // Results: /pokemon-species/1 from https://pokeapi.co/api/v2/pokemon-species/1/ for example
-        }
+        } // http://localhost:4202/pokedexapi
         console.log("calling URL: ", url);
         return this.http.get(url, {params: interval});
     }
