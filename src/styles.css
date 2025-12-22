@@ -2,23 +2,23 @@
     display: flow;
     text-align: center;
     vertical-align: middle;
-  
+
     @media only screen and (max-width: 300px) {
-      display: inline-flex;
-      width: 100px;
+        display: inline-flex;
+        width: 100px;
     }
-  }
-  
-  .tab {
+}
+
+.tab {
     cursor: pointer;
-  }
-  
-  html, body {
+}
+
+html, body {
     background-color: white;
     height: 100%;
-  }
-  
-  body {
+}
+
+body {
     margin: 0;
     font-family: Roboto, "Helvetica Neue", sans-serif;
-  }
+}
