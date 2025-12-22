@@ -6,7 +6,7 @@ console.log('[proxy] LOADED FILE:', __filename);
  * - Used only during local development
  * - Eliminates CORS issues by keeping requests same-origin (4200)
  */
-const mode = (process.env.POKEDEX_PROXY || 'prod').trim().toLowerCase();
+const mode = (process.env.POKEDEX_PROXY || 'dev').trim().toLowerCase();
 const useProd = mode === 'prod';
 
 console.log(`[proxy] mode=${mode}, useProd=${useProd}`);
