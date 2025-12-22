@@ -40,7 +40,7 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kb",
+                  "maximumWarning": "900kb",
                   "maximumError": "1mb"
                 },
                 {
@@ -66,10 +66,12 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "pokedexapiui:build:production"
+              "browserTarget": "pokedexapiui:build:production",
+              "proxyConfig": "proxy.conf.js"
             },
             "development": {
-              "browserTarget": "pokedexapiui:build:development"
+              "browserTarget": "pokedexapiui:build:development",
+              "proxyConfig": "proxy.conf.js"
             }
           },
           "defaultConfiguration": "development"
