@@ -48,7 +48,7 @@ export class SearchComponent implements OnInit {
   isValidName(nameOrId: string) {
     let code = 0;
     this.pokemonIDName = nameOrId.toLowerCase();
-    fetch("https://pokeapi.co/api/v2/pokemon/"+this.pokemonIDName)
+    fetch("/pokedexapi/pokemon"+this.pokemonIDName)
       .then((response) => {
         if (response.ok && nameOrId.length > 0) {
           code = 200;
@@ -94,8 +94,8 @@ export class SearchComponent implements OnInit {
         this.pokemonHeight = pokemon.height;
         this.pokemonWeight = pokemon.weight;
         // get and set color, and pokemon description
-        this.pokemonService.getPokemonSpeciesData(pokemon['species'].url)
-          .then((speciesData: any) => {
+        this.pokemonService.getPokemonSpecies(pokemon['species'].url)
+          .subscribe((speciesData: any) => {
             //console.log("pokemon species: ", speciesData);
             this.pokemonColor = speciesData['color']['name'];
             this.setBackgroundColor();

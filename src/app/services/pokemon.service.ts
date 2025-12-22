@@ -9,7 +9,8 @@ export class PokemonService {
   constructor(protected http: HttpClient) {}
 
   PokeAPI = require("pokeapi-js-wrapper")
-  Pokedex = new this.PokeAPI.Pokedex();
+  servicePokedex = new this.PokeAPI.Pokedex();
+  apiUrl = '/pokedexapi';
   savedPageNumber: number = 1;
   pokemonID: number = 0;
   itemsPerPage: number = 10
@@ -19,36 +20,38 @@ export class PokemonService {
       limit: _limit,
       offset: _offset
     }
-    return this.Pokedex.getPokemonsList(interval);
+    return this.servicePokedex.getPokemonsList(interval);
   }
 
   getPokemonByName(pokemonIDName: string | number) {
-    return this.Pokedex.getPokemonByName(pokemonIDName);
+    return this.servicePokedex.getPokemonByName(pokemonIDName);
   }
 
   getPokemonSpecificData(pokemonName: string) {
-    return this.Pokedex.getPokemonByName(pokemonName);
+    return this.servicePokedex.getPokemonByName(pokemonName);
   }
 
-  getPokemonSpeciesData(speciesURL: string) { // speciesURL: string
-    //console.log("service: ", this.Pokedex.getPokemonSpecies(pokemonIDName).then((res: any) => res.body))
-    //return this.Pokedex.getPokemonSpecies(pokemonIDName);
-    return this.callURL(speciesURL).toPromise();
+  getPokemonSpecies(speciesURL: string) { // speciesURL: string
+    return this.callURL(speciesURL);
   }
 
   getPokemonLocationEncounters(pokemonID: string) {
-    //console.log("inside pokemonLocationEncounters pokemonID: ", pokemonID);
-    return this.Pokedex.getPokemonEncounterAreas(pokemonID);
+    return this.servicePokedex.getPokemonEncounterAreas(pokemonID);
   }
 
   async getPokemonChainData(pokemonChainID: string): Promise<object> {
-    let response = await this.Pokedex.getEvolutionChain(pokemonChainID)
+    let response = await this.servicePokedex.getEvolutionChain(pokemonChainID)
     return response
   }
 
-  callURL(url: any) {
-    console.log("url: ", url);
-    return this.http.get(url);
+  callURL(url: any, interval: any = {}) {
+    let prodBase = "https://pokeapi.co/api/v2";
+    if (url.startsWith(prodBase)) {
+        console.debug("Converting production URL to local API URL");
+        url = this.apiUrl + url.split(prodBase)[1]; // Results: /pokemon-species/1 from https://pokeapi.co/api/v2/pokemon-species/1/ for example
+    }
+    console.log("calling URL: ", url);
+    return this.http.get(url, { params: interval });
   }
 
   saveCurrentPage(page: number) {

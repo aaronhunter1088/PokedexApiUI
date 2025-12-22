@@ -65,8 +65,8 @@ export class PokemonListComponent implements OnInit {
               pokemon.type = pokemonType;
               let frontImg = sprites['front_default'];
               pokemon.showDefaultImage = frontImg != null;
-              this.pokemonService.getPokemonSpeciesData(pokemon['species'].url)
-                .then((speciesData: any) => { // .subscribe
+              this.pokemonService.getPokemonSpecies(pokemon['species'].url)
+                .subscribe((speciesData: any) => { // .subscribe
                   //console.log("speciesData: ", speciesData)
                   pokemon.color = speciesData.color.name;
                   // edit weight

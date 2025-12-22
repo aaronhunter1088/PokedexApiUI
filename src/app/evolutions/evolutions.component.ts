@@ -210,8 +210,8 @@ export class EvolutionsComponent implements OnInit, OnChanges {
       pokemonList = [];
       this.pokemonService.getPokemonByName(id)
         .then((pokemonResponse: any) => {
-          this.pokemonService.getPokemonSpeciesData(pokemonResponse['species'].url) // pokemonResponse['species'].url
-            .then( (speciesData: any) => {
+          this.pokemonService.getPokemonSpecies(pokemonResponse['species'].url) // pokemonResponse['species'].url
+            .subscribe( (speciesData: any) => {
               let pokemon = this.createPokemon(pokemonResponse, speciesData);
               pokemonList.push(pokemon);
             });

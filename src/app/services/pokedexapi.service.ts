@@ -12,17 +12,14 @@ export class PokedexApiService extends PokemonService {
     super(http);
   }
 
-  //savedPageNumber: number = 1;
-  //pokemonID: number = 0;
-  //itemsPerPage: number = 10
-
   override getPokemonList(_limit: number, _offset: number) {
     const interval = {
-      limit: _limit ? _limit : 10,
+      limit: _limit ? Math.min(_limit,10) : 10,
       offset: _offset ? _offset : 0
     }
-    return this.http.get('http://localhost:8080/pokedex/pokemon', { params: interval }).pipe(
-      map((response: any) => response)
+    console.debug("URL: " + this.apiUrl+"/pokemon?limit="+interval.limit+"&offset="+interval.offset);
+    return this.callURL(this.apiUrl+"/pokemon", interval)
+        .pipe(map((response: any) => response)
     );
   }
 }
