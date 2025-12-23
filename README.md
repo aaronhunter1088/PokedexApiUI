@@ -1,4 +1,11 @@
-# PokedexApiUI
+# PokedexApiUI 
+#### Versions
+- Angular Front End for PokedexApi
+- Angular CLI: 15.0.5
+- Angular: 15.2.10
+- Node: 18.19.1
+- Package Manager: npm 9.2.7
+- App Version 1.2.0
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 15.0.2.
 This project works specifically with the PokedexApi project. This is the front end
@@ -8,6 +15,25 @@ of the application while the PokedexApi is the back end.
 
 Run `ng serve` for a dev server. Navigate to `http://localhost:4203/`. The application will automatically reload if you
 change any of the source files.
+
+The default port is set to 4203. 
+The proxy.conf.js file is used to redirect calls to the backend server. Referenced in angular.json.
+
+## Debugging the UI
+
+To debug the Angular application, we can create a run configuration which will also launch a JavaScript
+debugger for us. First, create a new Run Configuration for npm. Set the command to "run" and the
+script to "start". Start calls `ng serve` under the hood. Add the following arguments as well: 
+- --source-map 
+- --open
+- POKEDEX_PROXY=prod (Only if you want to use the production url for the backend)
+
+Next, click on `Browser/Live Edit` tab and enable opening the browser after launch. Set the browser to
+any that is allowed. Set the URL to `http://localhost:4203/`. Apply and save the configuration.
+Last, create a JavaScript Debug configuration. Give it a name, set the browser the the URL to the same
+one as before: `http://localhost:4203/`. Apply and save the configuration.
+When you start the npm run configuration, it will launch the browser, follwed by the JavaScript
+debug configuration, which attaches itself to the browser session.
 
 ## Code scaffolding
 
