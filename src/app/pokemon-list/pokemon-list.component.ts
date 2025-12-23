@@ -1,6 +1,6 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnChanges, OnInit} from '@angular/core';
+import { PokemonService } from "../services/pokemon.service";
 import {HttpClient} from "@angular/common/http";
-import {PokedexApiService} from '../services/pokedexapi.service';
 
 @Component({
     selector: 'app-pokemon-list',
@@ -18,7 +18,7 @@ export class PokemonListComponent implements OnInit {
     showGifs: boolean = false;
     gifImagePresent: boolean = false;
 
-    constructor(private pokemonService: PokedexApiService, private http: HttpClient) {
+    constructor(private pokemonService: PokemonService, private http: HttpClient) {
         this.itemsPerPage = 10
     }
 
@@ -41,7 +41,7 @@ export class PokemonListComponent implements OnInit {
         console.log("itemsPerPage: ", this.itemsPerPage);
         // @ts-ignore
         this.pokemonService.getPokemonList(this.itemsPerPage, (this.page - 1) * this.itemsPerPage)
-            .subscribe((pokemonListResponse: any) => {
+            .then((pokemonListResponse: any) => {
                 this.pokemonMap = this.newMap();
                 //console.log(response);
                 this.numberOfPokemon = pokemonListResponse.count;
@@ -65,8 +65,8 @@ export class PokemonListComponent implements OnInit {
                             pokemon.type = pokemonType;
                             let frontImg = sprites['front_default'];
                             pokemon.showDefaultImage = frontImg != null;
-                            this.pokemonService.getPokemonSpecies(pokemon['species'].url)
-                                .subscribe((speciesData: any) => { // .subscribe
+                            this.pokemonService.getPokemonSpecies(pokemon.name) // pokemon['species'].url
+                                .then((speciesData: any) => { // .subscribe
                                     //console.log("speciesData: ", speciesData)
                                     pokemon.color = speciesData.color.name;
                                     // edit weight
@@ -130,27 +130,17 @@ export class PokemonListComponent implements OnInit {
     }
 
     changeColor(pokemonColor: string): string {
-        if (pokemonColor === "red") {
-            return "#FA8072";
-        } else if (pokemonColor === "yellow") {
-            return "#ffeb18";
-        } else if (pokemonColor === "green") {
-            return "#AFE1AF";
-        } else if (pokemonColor === "blue") {
-            return "#ADD8E6";
-        } else if (pokemonColor === "purple") {
-            return "#CBC3E3";
-        } else if (pokemonColor === "brown") {
-            return "#D27D2D";
-        } else if (pokemonColor === "white") {
-            return "#d2cbd3";
-        } else if (pokemonColor === "pink") {
-            return "#ef6bb6ff";
-        } else if (pokemonColor === "black") {
-            return "#8f8b8b"
-        } else if (pokemonColor === "gray" || pokemonColor === "grey") {
-            return "#8f8b8b"
-        } else return "#ffffff";
+    if (pokemonColor === "red") { return "#FA8072"; }
+    else if (pokemonColor === "yellow") { return "#ffeb18"; }
+    else if (pokemonColor === "green") { return "#AFE1AF"; }
+    else if (pokemonColor === "blue") { return "#ADD8E6"; }
+    else if (pokemonColor === "purple") { return "#CBC3E3"; }
+    else if (pokemonColor === "brown") { return "#D27D2D"; }
+    else if (pokemonColor === "white") { return "#d2cbd3"; }
+    else if (pokemonColor === "pink") { return "#ef6bb6ff"; }
+    else if (pokemonColor === "black") { return "#8f8b8b"}
+    else if (pokemonColor === "gray" || pokemonColor === "grey") { return "#8f8b8b"}
+    else return "#ffffff";
     }
 
     setNewPageNumber(newPage: string) {

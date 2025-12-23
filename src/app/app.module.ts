@@ -13,8 +13,6 @@ import {OrderModule} from "ngx-order-pipe";
 import {ArraySortPipe} from './array-sort.pipe';
 import {EvolvesHowComponent} from './evolves-how/evolves-how.component';
 import {PokemonService} from './services/pokemon.service';
-import {PokedexApiService} from './services/pokedexapi.service';
-
 
 @NgModule({
     declarations: [
@@ -46,7 +44,7 @@ import {PokedexApiService} from './services/pokedexapi.service';
         BrowserAnimationsModule,
         OrderModule
     ],
-    providers: [PokemonService, PokedexApiService],
+    providers: [PokemonService],
     bootstrap: [AppComponent]
 })
 export class AppModule {

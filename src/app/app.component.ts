@@ -1,7 +1,7 @@
 import {Component, OnChanges, OnInit} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {Event, NavigationEnd, NavigationError, NavigationStart, Router} from '@angular/router';
-import {PokedexApiService} from './services/pokedexapi.service';
+import {PokemonService} from "./services/pokemon.service";
 
 @Component({
     selector: 'app-root',
@@ -14,7 +14,7 @@ export class AppComponent implements OnInit, OnChanges {
     previousRoute: string;
     title = 'PokedexHome'
 
-    constructor(private router: Router, private pokemonService: PokedexApiService, private http: HttpClient) {
+    constructor(private router: Router, private pokemonService: PokemonService, private http: HttpClient) {
         this.currentRoute = "";
         this.previousRoute = "";
         this.router.events.subscribe((event: Event) => {

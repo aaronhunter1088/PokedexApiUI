@@ -1,13 +1,13 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
+import {Pokedex} from 'pokeapi-js-wrapper';
 
 @Injectable({
     providedIn: 'root'
 })
 export class PokemonService {
 
-    PokeAPI = require("pokeapi-js-wrapper")
-    servicePokedex = new this.PokeAPI.Pokedex();
+    servicePokedex = new Pokedex();
     apiUrl = '/pokedexapi';
     savedPageNumber: number = 1;
     pokemonID: number = 0;
@@ -24,32 +24,55 @@ export class PokemonService {
         return this.servicePokedex.getPokemonsList(interval);
     }
 
-    getPokemonByName(pokemonIDName: string | number) {
-        return this.servicePokedex.getPokemonByName(pokemonIDName);
-    }
-
-    getPokemonSpecificData(pokemonName: string) {
+    getPokemonSpecificData(pokemonName: string | number) {
         return this.servicePokedex.getPokemonByName(pokemonName);
     }
 
-    getPokemonSpecies(speciesURL: string) {
-        return this.callURL(speciesURL);
+    getPokemonSpecies(pokemonName: string) {
+        return this.servicePokedex.getPokemonSpeciesByName(pokemonName);
     }
 
-    getPokemonLocationEncounters(pokemonID: string) {
-        return this.servicePokedex.getPokemonEncounterAreas(pokemonID);
+    async getPokemonLocationEncounters(pokemonName: string): Promise<string[]> {
+        const locationAreas: string[] = [];
+        try {
+            const locationAreasList: any = await this.servicePokedex.getLocationAreasList();
+            const urls: string[] = (locationAreasList.results || []).map((r: any) => r.url);
+
+            await Promise.all(
+                urls.map(
+                    url =>
+                        new Promise<void>(resolve => {
+                            this.callURL(url).subscribe({
+                                next: (locationAreaData: any) => {
+                                    const encounters = locationAreaData?.pokemon_encounters || [];
+                                    const found = encounters.some((enc: any) => enc?.pokemon?.name === pokemonName);
+                                    if (found) {
+                                        locationAreas.push(url);
+                                    }
+                                },
+                                error: () => resolve(),
+                                complete: () => resolve()
+                });
+            })
+                )
+            );
+        } catch (err) {
+            console.error('Failed to fetch location encounters', err);
+        }
+
+        return locationAreas;
     }
 
     async getPokemonChainData(pokemonChainID: string): Promise<object> {
-        let response = await this.servicePokedex.getEvolutionChain(pokemonChainID)
+        let response = await this.servicePokedex.getEvolutionChainById(Number.parseInt(pokemonChainID)) //.getEvolutionChain(pokemonChainID)
         return response
     }
 
     callURL(url: any, interval: any = {}) {
         let prodBase = "https://pokeapi.co/api/v2";
         if (url.startsWith(prodBase)) {
-            console.debug("Converting production URL to local API URL");
             url = this.apiUrl + url.split(prodBase)[1]; // Results: /pokemon-species/1 from https://pokeapi.co/api/v2/pokemon-species/1/ for example
+            console.debug("URL converted to local API URL", url);
         } // http://localhost:4202/pokedexapi
         console.log("calling URL: ", url);
         return this.http.get(url, {params: interval});
