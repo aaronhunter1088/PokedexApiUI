@@ -45,35 +45,6 @@ export class SearchComponent implements OnInit {
         this.pokemonIDName = pokemonIDName;
     }
 
-    isValidName(nameOrId: string) {
-        let code = 0;
-        this.pokemonIDName = nameOrId.toLowerCase();
-        fetch("/pokedexapi/pokemon" + this.pokemonIDName)
-            .then((response) => {
-                if (response.ok && nameOrId.length > 0) {
-                    code = 200;
-                    this.statusCode = code;
-                    console.log("Response.ok and code ", code, " and name/ID is '", nameOrId, "'");
-                } else if (!nameOrId) {
-                    code = 400;
-                    this.statusCode = code;
-                    alert("Not a valid name or ID: '" + this.pokemonIDName + "' and statusCode: " + this.statusCode);
-                    console.log("code", code);
-                    //return;
-                } else {
-                    throw new Error('Something went wrong');
-                }
-            })
-            .catch((error) => {
-                code = 404;
-                console.log("code", code);
-                this.statusCode = code;
-                this.pokemonIDName = nameOrId;
-                console.log('There was an ERROR: ', error);
-                alert("Not a valid name or ID: '" + this.pokemonIDName + "' and statusCode: " + this.statusCode);
-            });
-    }
-
     getPokemonInfo() {
         this.isValidName(this.pokemonIDName);
         this.pokemonDescription = '';
@@ -118,19 +89,21 @@ export class SearchComponent implements OnInit {
                         if (locations.length == 0) {
                             this.pokemonLocations.push("No known locations!");
                         } else {
-                            locations.forEach((location: any) => {
-                                let names = location['location_area']['name'].split("-")
-                                let newName = '';
-                                names.forEach((name: string) => {
-                                    name = name[0].toUpperCase() + name.substring(1);
-                                    newName += name + " ";
-                                    //console.log(newName);
-                                });
-                                this.pokemonLocations.push(newName);
+                            locations.forEach((loc: any) => {
+                                loc.forEach((location: any) => {
+                                    let names = location.location_area.name.split("-")
+                                    names.forEach((name: string) => {
+                                        name = name[0].toUpperCase() + name.substring(1);
+                                        this.pokemonLocations.push(name + " ");
+                                    });
+                                })
                             });
                             this.pokemonLocations.sort();
                         }
-                    });
+                    })
+                    .catch((error: any) => {
+                        throw new Error('Something went wrong', error);
+                    })
                 // moves
                 let allMoves = pokemon['moves'];
                 //console.log("all moves: ");
@@ -149,6 +122,33 @@ export class SearchComponent implements OnInit {
                 console.log(error);
             });
         this.pokemonIDName = '';
+    }
+
+    isValidName(nameOrId: string) {
+        this.pokemonIDName = nameOrId.toLowerCase();
+        this.pokemonService.getPokemonSpecificData(this.pokemonIDName)
+            .then((pokemon: any)=> {
+                this.statusCode = 200;
+                try {
+                    let isANumber = Number.parseInt(nameOrId)
+                    if (isNaN(isANumber)) throw new Error("Sent a name");
+                    console.log("Response.ok and code '", this.statusCode, "' and id is '", pokemon.id, "'");
+                } catch (e) {
+                    console.log("Response.ok and code '", this.statusCode, "' and name is '", pokemon.name, "'");
+                }
+            })
+            .catch((error: any) => {
+            if (!nameOrId) {
+                this.statusCode = 404;
+                alert("Not a valid name or ID: '" + this.pokemonIDName + "' and statusCode: " + this.statusCode);
+                throw new Error('Something went wrong', error);
+            } else {
+                this.statusCode = 500;
+                this.pokemonIDName = nameOrId;
+                alert("Not a valid name or ID: '" + this.pokemonIDName + "'. Status Code: " + this.statusCode);
+                throw new Error('Something went wrong', error);
+            }
+        });
     }
 
     setBackgroundColor() {
