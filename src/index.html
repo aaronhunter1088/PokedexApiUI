@@ -10,9 +10,43 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
-<body
-        [ngStyle]="{'background-color':'white'}"
-        class="mat-typography" style="justify-content:space-evenly;text-align:center;background-color:white;">
+<body id="app-body" class="mat-typography" style="justify-content:space-evenly;text-align:center;">
+<script>
+    (function() {
+        const body = document.getElementById('app-body');
+        const saved = localStorage.getItem('darkMode'); // 'on' | 'off' | null = auto
+        const now = new Date();
+        const hour = now.getHours();
+        const nightStart = 19; // 7 PM
+        const nightEnd = 7;    // 7 AM
+        let dark = false;
+        if (saved === 'on') dark = true;
+        else if (saved === 'off') dark = false;
+        else dark = (hour >= nightStart || hour < nightEnd);
+        if (dark) {
+            body.style.backgroundColor = 'black';
+            body.style.color = '#fff';
+            body.classList.add('dark-theme');
+        } else {
+            body.style.backgroundColor = 'white';
+            body.style.color = '';
+            body.classList.remove('dark-theme');
+        }
+        window.setUserDarkMode = function(mode) {
+            // mode: 'on' | 'off' | 'auto'
+            if (mode === 'auto') localStorage.removeItem('darkMode');
+            else localStorage.setItem('darkMode', mode);
+            // apply immediately
+            const nowHour = new Date().getHours();
+            const applyDark = mode === 'on' || (mode === 'auto' && (nowHour >= nightStart || nowHour < nightEnd));
+            if (applyDark) {
+                body.style.backgroundColor = 'black'; body.style.color = '#fff'; body.classList.add('dark-theme');
+            } else {
+                body.style.backgroundColor = 'white'; body.style.color = ''; body.classList.remove('dark-theme');
+            }
+        };
+    })();
+</script>
 <app-root></app-root><!-- see app-routing.module.ts -->
 </body>
 </html>
