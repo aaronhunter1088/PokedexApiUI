@@ -32,35 +32,8 @@ export class PokemonService {
         return this.servicePokedex.getPokemonSpeciesByName(pokemonName);
     }
 
-    async getPokemonLocationEncounters(pokemonName: string): Promise<string[]> {
-        const locationAreas: string[] = [];
-        try {
-            const locationAreasList: any = await this.servicePokedex.getLocationAreasList();
-            const urls: string[] = (locationAreasList.results || []).map((r: any) => r.url);
-
-            await Promise.all(
-                urls.map(
-                    url =>
-                        new Promise<void>(resolve => {
-                            this.callURL(url).subscribe({
-                                next: (locationAreaData: any) => {
-                                    const encounters = locationAreaData?.pokemon_encounters || [];
-                                    const found = encounters.some((enc: any) => enc?.pokemon?.name === pokemonName);
-                                    if (found) {
-                                        locationAreas.push(url);
-                                    }
-                                },
-                                error: () => resolve(),
-                                complete: () => resolve()
-                });
-            })
-                )
-            );
-        } catch (err) {
-            console.error('Failed to fetch location encounters', err);
-        }
-
-        return locationAreas;
+    async getPokemonLocationEncounters(locationAreaEncounterUrl: string): Promise<object> {
+        return await this.callURL(locationAreaEncounterUrl);
     }
 
     async getPokemonChainData(pokemonChainID: string): Promise<object> {

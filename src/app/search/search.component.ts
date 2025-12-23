@@ -113,7 +113,7 @@ export class SearchComponent implements OnInit {
                     this.pokemonType = this.pokemonType[0].type.name[0].toUpperCase() + this.pokemonType[0].type.name.substring(1);
                 }
                 // locations
-                this.pokemonService.getPokemonLocationEncounters(this.pokemonName)
+                this.pokemonService.getPokemonLocationEncounters(pokemon.location_area_encounters)
                     .then((locations: any) => {
                         if (locations.length == 0) {
                             this.pokemonLocations.push("No known locations!");

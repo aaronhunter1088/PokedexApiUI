@@ -105,20 +105,21 @@ export class PokedexComponent implements OnInit, OnChanges {
                                 this.pokemonType = this.pokemonType[0].type.name[0].toUpperCase() + this.pokemonType[0].type.name.substring(1)
                             }
                             // locations
-                            this.pokemonService.getPokemonLocationEncounters(this.pokemonName).then(
-                                (locations: any) => {
+                            this.pokemonService.getPokemonLocationEncounters(pokemon.location_area_encounters)
+                                .then((locations: any) => {
                                     if (locations.length == 0) {
                                         this.pokemonLocations.push("No known locations!")
                                     } else {
-                                        locations.forEach((location: any) => {
-                                            let names = location['location_area']['name'].split("-")
-                                            let newName = ''
-                                            names.forEach((name: string) => {
-                                                name = name[0].toUpperCase() + name.substring(1)
-                                                newName += name + " "
-                                                //console.log(newName);
+                                        locations.forEach((loc: any) => {
+                                            loc.forEach((location:any) => {
+                                                let names = location['location_area']['name'].split("-")
+                                                let newName = ''
+                                                names.forEach((name: string) => {
+                                                    name = name[0].toUpperCase() + name.substring(1)
+                                                    newName += name + " "
+                                                })
+                                                this.pokemonLocations.push(newName)
                                             })
-                                            this.pokemonLocations.push(newName)
                                         })
                                         this.pokemonLocations.sort()
                                     }
