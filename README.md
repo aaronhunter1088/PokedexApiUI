@@ -3,6 +3,7 @@
 - Angular Front End for PokedexApi
 - Angular CLI: 15.0.5
 - Angular: 15.2.10
+- TypeScript: 4.8.4 (version check: npx tsc -v)
 - Node: 18.19.1
 - Package Manager: npm 9.2.7
 - App Version 1.2.0
