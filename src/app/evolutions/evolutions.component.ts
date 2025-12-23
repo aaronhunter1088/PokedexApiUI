@@ -41,47 +41,33 @@ export class EvolutionsComponent implements OnInit, OnChanges {
 
     ngOnInit() {
         //console.log("Evolutions Page loaded");
-        this.route.params
-            .subscribe(params => {
-                //console.log("params", params)
-                if (Object.keys(params).length !== 0) {
-                    //console.log("params keys.length: ", Object.keys(params).length)
-                    this.pokemonID = <number>params['pokemonID'];
-                }
-                if (this.pokemonID != null) {
-                    //console.log("chosen pokemon with ID: '" + this.pokemonID + "'")
-                    this.resetEvolutionParameters()
-                    this.pokemonChainID = this.getEvolutionChainID(Number.parseInt(this.pokemonID.toString()))
-                    Array.of(this.pokemonIDToEvolutionChainMap.get(this.pokemonChainID)).forEach(family => {
-                        // @ts-ignore
-                        this.pokemonFamilyIDs = family; // a list of list of IDs [ [1], [2], [3,10033,10195] ]
-                        this.setFamilySize();
-                        this.setStages();
-                        this.setAllIDs();
-                        // let chainRes = this.pokemonService.getPokemonChainData(this.pokemonChainID.toString());
-                        // chainRes.then((chain:any) => {
-                        //   this.getEvolutionDetails(chain['chain']) //, this.specificAttributesMap, this.pokemonIdAndAttributesMap)
-                        // }).then(() => {
-                        //   this.allIDs.forEach(id => {
-                        //     if (!this.pokemonIdAndAttributesMap.has(id)) {
-                        //       console.log(id, " not found in attrMapNew. populating with default attrMapNew")
-                        //       this.pokemonIdAndAttributesMap.set(id, this.generateDefaultAttributesMap())
-                        //     }
-                        //   })
-                        // }).then(() => {
-                        //   this.cleanupAttributesMap()
-                        // })
-                    })
-                    this.pokemonFamilyIDs.forEach(idList => {
-                        this.createListOfPokemonForIDList(idList)
-                    });
-
-                }
-            })
+        this.route.params.subscribe(params => {
+            //console.log("params", params)
+            if (Object.keys(params).length !== 0) {
+                //console.log("params keys.length: ", Object.keys(params).length)
+                this.pokemonID = <number>params['pokemonID'];
+            }
+            if (this.pokemonID != null) {
+                //console.log("chosen pokemon with ID: '" + this.pokemonID + "'")
+                this.resetEvolutionParameters()
+                this.pokemonChainID = this.getEvolutionChainID(Number.parseInt(this.pokemonID.toString()))
+                Array.of(this.pokemonIDToEvolutionChainMap.get(this.pokemonChainID)).forEach(family => {
+                    // @ts-ignore
+                    this.pokemonFamilyIDs = family; // a list of list of IDs [ [1], [2], [3,10033,10195] ]
+                    this.setFamilySize();
+                    this.setStages();
+                    this.setAllIDs();
+                })
+                this.pokemonFamilyIDs.forEach(idList => {
+                    this.createListOfPokemonForIDList(idList)
+                });
+            }
+        })
     }
 
     ngOnChanges() {
-        //console.log("changes in evolutions")
+        // was noticing that evolutions were not reloading on ID change
+        this.ngOnInit();
     }
 
     // attributes map for each pokemon, which holds ALL evolution details
@@ -216,21 +202,37 @@ export class EvolutionsComponent implements OnInit, OnChanges {
 
     createListOfPokemonForIDList(idList: any[]) {
         //console.log("IDList: ", idList, " length: ", idList.length)
-        let pokemonList: any[] = [];
+        let pokemonList: any[] = []
+        let previousPokemonName: string; // Must be a string here
+        let pokemon: any = {};
+        let pokemonSpecies: any = {};
         Array.from(idList).forEach((id: any) => {
-            //console.log("id: ",id);
             pokemonList = [];
             this.pokemonService.getPokemonSpecificData(id)
                 .then((pokemonResponse: any) => {
                     this.pokemonService.getPokemonSpecies(pokemonResponse.name) // pokemonResponse['species'].url
                         .then((speciesData: any) => {
-                            let pokemon = this.createPokemon(pokemonResponse, speciesData);
+                            pokemonSpecies = speciesData
+                            let pokemon = this.createPokemon(pokemonResponse, pokemonSpecies);
                             pokemonList.push(pokemon);
+                            previousPokemonName = pokemon.name
+                        })
+                        .catch((error: any) => {
+                            console.error("Couldn't get Pokemon species with id: '" + id + "'. Trying with " + previousPokemonName, error);
+                            this.pokemonService.getPokemonSpecies(previousPokemonName) // pokemonResponse['species'].url
+                                .then((speciesData: any) => {
+                                    pokemonSpecies = speciesData
+                                    let pokemon = this.createPokemon(pokemonResponse, pokemonSpecies);
+                                    pokemonList.push(pokemon);
+                                })
+                                .catch((error: any) => {
+                                    console.error("Couldn't get Pokemon species with previousPokemonName: '" + previousPokemonName + "'", error);
+                                });
                         });
                 })
-            //pokemonList.sort(function (a, b) { return a.id-b.id; });
-            //console.log("adding list to familyList: ", pokemonList, " length is ", pokemonList.length)
-            //this.pokemonFamily.push(pokemonList);
+                .catch((error: any) => {
+                    console.error("Couldn't get Pokemon with ID: '" + id + "'", error);
+                });
         })
         pokemonList.sort(function (a, b) {
             return a.id - b.id;
@@ -355,7 +357,7 @@ export class EvolutionsComponent implements OnInit, OnChanges {
             name: pokemonResponse.name,
             height: adjustedHeight,
             weight: adjustedWeight,
-            color: speciesData['color'].name,
+            color: speciesData?.color?.name ?? null,
             type: pokemonType,
             photo: this.defaultImagePresent ? frontImg : officialImg
         }
