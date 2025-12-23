@@ -140,7 +140,7 @@ export class EvolutionsComponent implements OnInit, OnChanges {
     }
 
     getPokemonSprites(pokemonID: any): any {
-        this.pokemonService.getPokemonByName(pokemonID)
+        this.pokemonService.getPokemonSpecificData(pokemonID)
             .then((pokemon: any) => {
                 let sprites = pokemon['sprites'];
                 let otherSprites = sprites['other'];
@@ -220,10 +220,10 @@ export class EvolutionsComponent implements OnInit, OnChanges {
         Array.from(idList).forEach((id: any) => {
             //console.log("id: ",id);
             pokemonList = [];
-            this.pokemonService.getPokemonByName(id)
+            this.pokemonService.getPokemonSpecificData(id)
                 .then((pokemonResponse: any) => {
-                    this.pokemonService.getPokemonSpecies(pokemonResponse['species'].url) // pokemonResponse['species'].url
-                        .subscribe((speciesData: any) => {
+                    this.pokemonService.getPokemonSpecies(pokemonResponse.name) // pokemonResponse['species'].url
+                        .then((speciesData: any) => {
                             let pokemon = this.createPokemon(pokemonResponse, speciesData);
                             pokemonList.push(pokemon);
                         });

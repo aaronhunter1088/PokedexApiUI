@@ -59,7 +59,7 @@ export class PokedexComponent implements OnInit, OnChanges {
                     this.pokemonDescription = ''
                     this.pokemonLocations = []
                     this.pokemonMoves = []
-                    this.pokemonService.getPokemonByName(this.pokemonID)
+                    this.pokemonService.getPokemonSpecificData(this.pokemonID)
                         .then((pokemon: any) => {
                             //console.log("pokemon: ", pokemon)
                             this.pokemonName = pokemon.name
@@ -86,10 +86,10 @@ export class PokedexComponent implements OnInit, OnChanges {
                             else height = height.slice(0, -1) + '.' + height.slice(-1)
                             this.pokemonHeight = height
                             // get and set color, and pokemon description
-                            this.pokemonService.getPokemonSpecies(species.url)
-                                .subscribe((speciesData: any) => {
+                            this.pokemonService.getPokemonSpecies(this.pokemonName)
+                                .then((speciesData: any) => {
                                     //console.log("pokemon species: ", speciesData);
-                                    this.pokemonColor = speciesData['color']['name'];
+                                    this.pokemonColor = speciesData.color.name;
                                     this.changeColor(this.pokemonColor);
                                     this.pokemonDescriptions = speciesData.flavor_text_entries;
                                     this.pokemonDescription = this.getEnglishDescriptions();
@@ -105,7 +105,7 @@ export class PokedexComponent implements OnInit, OnChanges {
                                 this.pokemonType = this.pokemonType[0].type.name[0].toUpperCase() + this.pokemonType[0].type.name.substring(1)
                             }
                             // locations
-                            this.pokemonService.getPokemonLocationEncounters(this.pokemonID.toString()).then(
+                            this.pokemonService.getPokemonLocationEncounters(this.pokemonName).then(
                                 (locations: any) => {
                                     if (locations.length == 0) {
                                         this.pokemonLocations.push("No known locations!")
