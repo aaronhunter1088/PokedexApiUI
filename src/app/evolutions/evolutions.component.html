@@ -11,7 +11,7 @@
         <div *ngFor="let pokemon of list | sort:'{{pokemon.id}}'; let isNotLast = last;"
              class="pokemon-grid">
             <nav>
-                <a routerLink="/pokedex/?pokemonID={{pokemon.id}}" style="text-decoration: none; color: black;">
+                <a routerLink="/pokedex/{{pokemon.id}}" style="text-decoration: none; color: black;">
                     <div [ngStyle]="{'background-color':changeColor(pokemon.color)}" class="box"
                          style="display:inline-block;">
                         <div id="idAndName" style="display:inline-flex;">
