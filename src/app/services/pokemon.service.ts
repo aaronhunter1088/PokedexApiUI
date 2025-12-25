@@ -16,16 +16,19 @@ export class PokemonService {
     constructor(protected http: HttpClient) {
     }
 
-    getPokemonList(_limit: number, _offset: number) {
-        const interval = {
-            limit: _limit,
-            offset: _offset
-        }
-        return this.servicePokedex.getPokemonsList(interval);
+    getPokemonList(_limit: number, _offset: number) : Promise<any> {
+        // const interval = {
+        //     limit: _limit,
+        //     offset: _offset
+        // }
+        // return this.servicePokedex.getPokemonsList(interval);
+        return this.callURL("/pokedexapi/pokemon?limit=" + _limit + "&offset=" + _offset).toPromise();
     }
 
-    getPokemonSpecificData(pokemonName: string | number) {
-        return this.servicePokedex.getPokemonByName(pokemonName);
+    getPokemonSpecificData(pokemonName: string | number) : Promise<any> {
+        //return this.servicePokedex.getPokemonByName(pokemonName);
+        console.log("Calling getPokemonSpecificData for: ", pokemonName);
+        return this.callURL("/pokedexapi/pokemon/" + pokemonName).toPromise();
     }
 
     getPokemonSpecies(pokemonName: string) {
