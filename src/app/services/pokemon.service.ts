@@ -1,38 +1,33 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
-import {Pokedex} from 'pokeapi-js-wrapper';
+//import {Pokedex} from 'pokeapi-js-wrapper';
 
 @Injectable({
     providedIn: 'root'
 })
 export class PokemonService {
 
-    servicePokedex = new Pokedex();
-    apiUrl = '/pokedexapi';
+    //servicePokedex = new Pokedex();
     savedPageNumber: number = 1;
     pokemonID: number = 0;
     itemsPerPage: number = 10
+    POKEAPI_CONTEXT_BASE = "/pokedexapi";
 
     constructor(protected http: HttpClient) {
     }
 
-    getPokemonList(_limit: number, _offset: number) : Promise<any> {
-        // const interval = {
-        //     limit: _limit,
-        //     offset: _offset
-        // }
-        // return this.servicePokedex.getPokemonsList(interval);
-        return this.callURL("/pokedexapi/pokemon?limit=" + _limit + "&offset=" + _offset).toPromise();
+    async getPokemonList(_limit: number, _offset: number) : Promise<object | undefined> {
+        return await this.callURL(this.POKEAPI_CONTEXT_BASE + "/pokemon?limit=" + _limit + "&offset=" + _offset);
     }
 
-    getPokemonSpecificData(pokemonName: string | number) : Promise<any> {
+    async getPokemonSpecificData(pokemonName: string | number) : Promise<object | undefined> {
         //return this.servicePokedex.getPokemonByName(pokemonName);
         console.log("Calling getPokemonSpecificData for: ", pokemonName);
-        return this.callURL("/pokedexapi/pokemon/" + pokemonName).toPromise();
+        return await this.callURL(this.POKEAPI_CONTEXT_BASE + "/pokemon/" + pokemonName);
     }
 
-    getPokemonSpecies(pokemonName: string) {
-        return this.servicePokedex.getPokemonSpeciesByName(pokemonName);
+    async getPokemonSpecies(pokemon: any): Promise<object | undefined> {
+        return await this.callURL(pokemon.species.url); // no base needed on actual urls
     }
 
     async getPokemonLocationEncounters(locationAreaEncounterUrl: string): Promise<object> {
@@ -40,17 +35,22 @@ export class PokemonService {
     }
 
     async getPokemonChainData(pokemonChainID: string): Promise<object> {
-        return await this.servicePokedex.getEvolutionChainById(Number.parseInt(pokemonChainID)) //.getEvolutionChain(pokemonChainID)
+        return await this.callURL(this.POKEAPI_CONTEXT_BASE + "/evolution-chain/" + pokemonChainID);
     }
 
-    callURL(url: any, interval: any = {}) {
+    async callURL(url: any, interval: any = {}): Promise<any> {
         let prodBase = "https://pokeapi.co/api/v2";
         if (url.startsWith(prodBase)) {
-            url = this.apiUrl + url.split(prodBase)[1]; // Results: /pokemon-species/1 from https://pokeapi.co/api/v2/pokemon-species/1/ for example
+            url = this.POKEAPI_CONTEXT_BASE + url.split(prodBase)[1];
             console.debug("URL converted to local API URL", url);
-        } // http://localhost:4202/pokedexapi
+        }
         console.log("calling URL: ", url);
-        return this.http.get(url, {params: interval});
+        return new Promise((resolve, reject) => {
+            this.http.get(url, { params: interval }).subscribe({
+                next: (res) => resolve(res),
+                error: (err) => reject(err)
+            });
+        });
     }
 
     saveCurrentPage(page: number) {

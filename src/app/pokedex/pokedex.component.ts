@@ -85,7 +85,7 @@ export class PokedexComponent implements OnInit, OnChanges {
                         else height = height.slice(0, -1) + '.' + height.slice(-1)
                         this.pokemonHeight = height
                         // get and set color, and pokemon description
-                        this.pokemonService.getPokemonSpecies(this.pokemonName)
+                        this.pokemonService.getPokemonSpecies(pokemon)
                             .then((speciesData: any) => {
                                 //console.log("pokemon species: ", speciesData);
                                 this.pokemonColor = speciesData.color.name;

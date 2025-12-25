@@ -65,7 +65,16 @@ export class PokemonListComponent implements OnInit {
                             pokemon.type = pokemonType;
                             let frontImg = sprites['front_default'];
                             pokemon.showDefaultImage = frontImg != null;
-                            this.pokemonService.getPokemonSpecies(pokemon.name) // pokemon['species'].url
+
+                            // Ensure species URL exists and add explicit error logging
+                            const speciesUrl = pokemon?.species?.url;
+                            if (!speciesUrl) {
+                                console.error('getPokemonSpecies: species.url is missing for', pokemon.name, pokemon);
+                                this.pokemonMap.set(pokemon.id, pokemon);
+                                return;
+                            }
+
+                            this.pokemonService.getPokemonSpecies(pokemon) // pokemon['species'].url
                                 .then((speciesData: any) => { // .subscribe
                                     //console.log("speciesData: ", speciesData)
                                     pokemon.color = speciesData.color.name;
@@ -79,6 +88,12 @@ export class PokemonListComponent implements OnInit {
                                     if (height.length == 1) height = "0." + height
                                     else height = height.slice(0, -1) + '.' + height.slice(-1)
                                     pokemon.height = height;
+                                    this.pokemonMap.set(pokemon.id, pokemon);
+                                })
+                                .catch((err) => {
+                                    console.error('getPokemonSpecies failed for URL:', speciesUrl, err);
+                                    // Set defaults so UI still renders
+                                    pokemon.color = 'white';
                                     this.pokemonMap.set(pokemon.id, pokemon);
                                 });
                         });

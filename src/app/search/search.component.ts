@@ -65,7 +65,7 @@ export class SearchComponent implements OnInit {
                 this.pokemonHeight = pokemon.height;
                 this.pokemonWeight = pokemon.weight;
                 // get and set color, and pokemon description
-                this.pokemonService.getPokemonSpecies(pokemon.name)
+                this.pokemonService.getPokemonSpecies(pokemon)
                     .then((speciesData: any) => {
                         //console.log("pokemon species: ", speciesData);
                         this.pokemonColor = speciesData.color.name;
