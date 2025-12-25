@@ -69,12 +69,12 @@
           },
           "configurations": {
             "production": {
-              "browserTarget": "pokedexapiui:build:production",
-              "proxyConfig": "proxy.conf.js"
+              "proxyConfig": "proxy.conf.js",
+              "buildTarget": "pokedexapiui:build:production"
             },
             "development": {
-              "browserTarget": "pokedexapiui:build:development",
-              "proxyConfig": "proxy.conf.js"
+              "proxyConfig": "proxy.conf.js",
+              "buildTarget": "pokedexapiui:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -82,7 +82,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "pokedexapiui:build"
+            "buildTarget": "pokedexapiui:build"
           }
         },
         "test": {
