@@ -150,7 +150,7 @@ export class PokedexComponent implements OnInit, OnChanges {
     }
 
     @HostListener('window:resize', ['$event'])
-    onResize() {
+    onResize(event: any) {
         this.screenWidth = window.innerWidth;
         this.screenHeight = window.innerHeight;
         //console.log("w: " + this.screenWidth + " h: " + this.screenHeight);
