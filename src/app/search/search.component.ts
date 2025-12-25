@@ -73,7 +73,10 @@ export class SearchComponent implements OnInit {
                         this.setBackgroundColor();
                         this.pokemonDescriptions = speciesData.flavor_text_entries;
                         this.pokemonDescription = this.getEnglishDescriptions();
-                    }); //.subscribe
+                    })
+                    .catch((err: any)  => {
+                        throw new Error('Something went wrong', err);
+                    });
                 // parse over the types
                 this.pokemonType = pokemon.types;
                 //console.log("pokemonType", pokemon.types);
@@ -90,14 +93,12 @@ export class SearchComponent implements OnInit {
                         if (locations.length == 0) {
                             this.pokemonLocations.push("No known locations!");
                         } else {
-                            locations.forEach((loc: any) => {
-                                loc.forEach((location: any) => {
-                                    let names = location.location_area.name.split("-")
-                                    names.forEach((name: string) => {
-                                        name = name[0].toUpperCase() + name.substring(1);
-                                        this.pokemonLocations.push(name + " ");
-                                    });
-                                })
+                            locations.forEach((location: any) => {
+                                let names = location?.location_area?.name.split("-")
+                                names.forEach((name: string) => {
+                                    name = name[0].toUpperCase() + name.substring(1);
+                                    this.pokemonLocations.push(name + " ");
+                                });
                             });
                             this.pokemonLocations.sort();
                         }

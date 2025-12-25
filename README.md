@@ -1,9 +1,9 @@
 # PokedexApiUI 
 #### Versions
-- Angular Front End for PokedexApi v1.2.18
+- Angular Front End for PokedexApi v1.2.19
 - Inception Year: 2024
-- Angular CLI: 18.2.21
-- Angular: 18.2.14
+- Angular CLI: 19.2.19
+- Angular: 19.2.17
 - TypeScript: 5.8.3 (version check: npx tsc -v)
 - Node: 24.12.0
 - Package Manager: npm 11.6.2

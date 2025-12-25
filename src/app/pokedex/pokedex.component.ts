@@ -54,7 +54,7 @@ export class PokedexComponent implements OnInit, OnChanges {
                 //console.log("params keys.length: ", Object.keys(params).length)
                 this.pokemonID = <number>params['pokemonID']
             }
-            if (this.pokemonID > 0) {
+            if (Number.parseInt(<string>this.pokemonID) > 0) {
                 //console.log("chosen pokemon with ID: '" + this.pokemonID + "'")
                 this.pokemonDescription = ''
                 this.pokemonLocations = []
@@ -111,20 +111,19 @@ export class PokedexComponent implements OnInit, OnChanges {
                                     this.pokemonLocations.push("No known locations!")
                                 }
                                 else {
-                                    locations.forEach((loc: any) => {
-                                        loc.forEach((location:any) => {
-                                            let names = location['location_area']['name'].split("-")
-                                            let newName = ''
-                                            names.forEach((name: string) => {
-                                                name = name[0].toUpperCase() + name.substring(1)
-                                                newName += name + " "
-                                            })
-                                            this.pokemonLocations.push(newName)
+                                    locations.forEach((location: any) => {
+                                        let names = location?.location_area?.name.split("-")
+                                        let newName = ''
+                                        names.forEach((name: string) => {
+                                            name = name[0].toUpperCase() + name.substring(1)
+                                            newName += name + " "
                                         })
+                                        this.pokemonLocations.push(newName)
                                     })
                                     this.pokemonLocations.sort()
                                 }
-                            }).catch((error: any) => {
+                            })
+                            .catch((error: any) => {
                                 console.error("Couldn't get Pokemon locations with: '" + this.pokemonID + "'", error)
                             });
                         // moves
