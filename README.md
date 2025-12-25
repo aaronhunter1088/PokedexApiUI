@@ -1,12 +1,12 @@
 # PokedexApiUI 
 #### Versions
-- Angular Front End for PokedexApi v1.2.15
+- Angular Front End for PokedexApi v1.2.16
 - Inception Year: 2024
-- Angular CLI: 15.0.5
-- Angular: 15.2.10
-- TypeScript: 4.8.4 (version check: npx tsc -v)
-- Node: 18.19.1
-- Package Manager: npm 9.2.7
+- Angular CLI: 16.2.16
+- Angular: 16.2.12
+- TypeScript: 4.9.5 (version check: npx tsc -v)
+- Node: 24.12.0
+- Package Manager: npm 11.6.2
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 15.0.2.
 This project works specifically with the PokedexApi project. This is the front end
