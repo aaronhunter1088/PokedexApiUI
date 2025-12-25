@@ -27,7 +27,14 @@ export class PokemonService {
     }
 
     async getPokemonSpecies(pokemon: any): Promise<object | undefined> {
-        return await this.callURL(pokemon.species.url); // no base needed on actual urls
+        console.debug("calling species URL: ", pokemon?.species?.url);
+        //return await this.callURL(pokemon?.species?.url); // no base needed on actual urls
+        return new Promise((resolve, reject) => {
+            this.http.get(pokemon?.species?.url, { params: {} }).subscribe({
+                next: (res) => resolve(res),
+                error: (err) => reject(err)
+            });
+        });
     }
 
     async getPokemonLocationEncounters(locationAreaEncounterUrl: string): Promise<object> {
