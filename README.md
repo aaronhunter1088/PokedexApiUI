@@ -2,7 +2,7 @@
 
 #### Versions
 
-- Angular Front End for PokedexApi v1.3.21
+- Angular Front End for PokedexApi v1.3.22
 - Inception Year: 2024
 - Angular CLI: 20.3.13
 - Angular: 20.3.15
