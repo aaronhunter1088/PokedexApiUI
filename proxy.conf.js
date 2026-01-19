@@ -15,7 +15,7 @@ module.exports = {
     '/pokedexapi': {
         target: useProd
             ? 'https://pokeapi.co/api/v2'
-            : 'http://localhost:4202/pokedexapi',
+            : 'http://localhost:4204/pokedexapi',
 
         changeOrigin: true,
         secure: true,
@@ -25,5 +25,11 @@ module.exports = {
         pathRewrite: {
             '^/pokedexapi': ''
         }
+    },
+    '/combined': {
+        target: 'http://localhost:4203',
+        changeOrigin: false,
+        secure: true,
+        logLevel: 'debug',
     }
 };
