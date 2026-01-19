@@ -1,5 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {PokemonService} from "../services/pokemon.service";
+import {DarkModeService} from "../services/dark-mode.service";
+import {Router} from "@angular/router";
 
 @Component({
     selector: 'app-search',
@@ -34,12 +36,15 @@ export class SearchComponent implements OnInit {
     screenWidth: number = 0;
     screenHeight: number = 0;
     styleFlag: boolean = false;
+    isDarkMode: boolean = false;
 
-    constructor(private pokemonService: PokemonService) {
-
+    constructor(private pokemonService: PokemonService, private router: Router, public darkModeService: DarkModeService) {
     }
 
     ngOnInit(): void {
+        this.darkModeService.darkMode$.subscribe(isDark => {
+            this.isDarkMode = isDark;
+        });
     }
 
     onInput(pokemonIDName: string) {
@@ -74,7 +79,7 @@ export class SearchComponent implements OnInit {
                         this.pokemonDescriptions = speciesData.flavor_text_entries;
                         this.pokemonDescription = this.getEnglishDescriptions();
                     })
-                    .catch((err: any)  => {
+                    .catch((err: any) => {
                         throw new Error('Something went wrong', err);
                     });
                 // parse over the types
@@ -129,7 +134,7 @@ export class SearchComponent implements OnInit {
     isValidName(nameOrId: string) {
         this.pokemonIDName = nameOrId.toLowerCase();
         this.pokemonService.getPokemonSpecificData(this.pokemonIDName)
-            .then((pokemon: any)=> {
+            .then((pokemon: any) => {
                 this.statusCode = 200;
                 try {
                     let isANumber = Number.parseInt(nameOrId)
@@ -140,17 +145,17 @@ export class SearchComponent implements OnInit {
                 }
             })
             .catch((error: any) => {
-            if (!nameOrId) {
-                this.statusCode = 404;
-                alert("Not a valid name or ID: '" + this.pokemonIDName + "' and statusCode: " + this.statusCode);
-                throw new Error('Something went wrong', error);
-            } else {
-                this.statusCode = 500;
-                this.pokemonIDName = nameOrId;
-                alert("Not a valid name or ID: '" + this.pokemonIDName + "'. Status Code: " + this.statusCode);
-                throw new Error('Something went wrong', error);
-            }
-        });
+                if (!nameOrId) {
+                    this.statusCode = 404;
+                    alert("Not a valid name or ID: '" + this.pokemonIDName + "' and statusCode: " + this.statusCode);
+                    throw new Error('Something went wrong', error);
+                } else {
+                    this.statusCode = 500;
+                    this.pokemonIDName = nameOrId;
+                    alert("Not a valid name or ID: '" + this.pokemonIDName + "'. Status Code: " + this.statusCode);
+                    throw new Error('Something went wrong', error);
+                }
+            });
     }
 
     setBackgroundColor() {

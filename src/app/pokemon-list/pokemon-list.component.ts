@@ -1,6 +1,8 @@
-import {Component, OnChanges, OnInit} from '@angular/core';
-import { PokemonService } from "../services/pokemon.service";
+import {Component, OnInit} from '@angular/core';
+import {PokemonService} from "../services/pokemon.service";
 import {HttpClient} from "@angular/common/http";
+import {DarkModeService} from "../services/dark-mode.service";
+import {environment} from "../../environments/environment";
 
 @Component({
     selector: 'app-pokemon-list',
@@ -18,8 +20,10 @@ export class PokemonListComponent implements OnInit {
     defaultImagePresent: boolean = false;
     showGifs: boolean = false;
     gifImagePresent: boolean = false;
+    landingPageUrl: string = environment.landingPageUrl;
 
-    constructor(private pokemonService: PokemonService, private http: HttpClient) {
+    constructor(private pokemonService: PokemonService, private http: HttpClient,
+                private darkModeService: DarkModeService) {
         this.itemsPerPage = 10
     }
 
@@ -146,17 +150,27 @@ export class PokemonListComponent implements OnInit {
     }
 
     changeColor(pokemonColor: string): string {
-    if (pokemonColor === "red") { return "#FA8072"; }
-    else if (pokemonColor === "yellow") { return "#ffeb18"; }
-    else if (pokemonColor === "green") { return "#AFE1AF"; }
-    else if (pokemonColor === "blue") { return "#ADD8E6"; }
-    else if (pokemonColor === "purple") { return "#CBC3E3"; }
-    else if (pokemonColor === "brown") { return "#D27D2D"; }
-    else if (pokemonColor === "white") { return "#d2cbd3"; }
-    else if (pokemonColor === "pink") { return "#ef6bb6ff"; }
-    else if (pokemonColor === "black") { return "#8f8b8b"}
-    else if (pokemonColor === "gray" || pokemonColor === "grey") { return "#8f8b8b"}
-    else return "#ffffff";
+        if (pokemonColor === "red") {
+            return "#FA8072";
+        } else if (pokemonColor === "yellow") {
+            return "#ffeb18";
+        } else if (pokemonColor === "green") {
+            return "#AFE1AF";
+        } else if (pokemonColor === "blue") {
+            return "#ADD8E6";
+        } else if (pokemonColor === "purple") {
+            return "#CBC3E3";
+        } else if (pokemonColor === "brown") {
+            return "#D27D2D";
+        } else if (pokemonColor === "white") {
+            return "#d2cbd3";
+        } else if (pokemonColor === "pink") {
+            return "#ef6bb6ff";
+        } else if (pokemonColor === "black") {
+            return "#8f8b8b"
+        } else if (pokemonColor === "gray" || pokemonColor === "grey") {
+            return "#8f8b8b"
+        } else return "#ffffff";
     }
 
     setNewPageNumber(newPage: string) {
@@ -184,5 +198,14 @@ export class PokemonListComponent implements OnInit {
             this.itemsPerPage = chosenNumber
             this.getThePokemon();
         }
+    }
+
+    /**
+     * Navigate back to the landing page with the current dark mode setting
+     */
+    navigateToLandingPage(): void {
+        const currentDarkMode = this.darkModeService.getDarkMode();
+        const url = `${this.landingPageUrl}?darkmode=${currentDarkMode}`;
+        window.location.href = url;
     }
 }
