@@ -12,10 +12,14 @@ const routes: Routes = [
 ];
 
 @NgModule({
-    imports: [RouterModule.forRoot(routes)],
+    imports: [RouterModule.forRoot(routes, {
+        onSameUrlNavigation: 'reload',
+        paramsInheritanceStrategy: 'always'
+    })],
     exports: [RouterModule]
 })
 export class AppRoutingModule {
 }
 
-export const routingComponents = [SearchComponent, PokemonListComponent, PokedexComponent, EvolutionsComponent]
+export const routingComponents = [
+    SearchComponent, PokemonListComponent, PokedexComponent, EvolutionsComponent]

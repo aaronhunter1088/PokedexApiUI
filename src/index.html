@@ -1,54 +1,41 @@
 <!doctype html>
 <html lang="en">
-<head>
-    <meta charset="utf-8">
-    <title>Pok&#233;dex Angular/Spring Boot</title>
-    <base href="/">
-    <meta content="width=device-width, initial-scale=1" name="viewport">
-    <link href="./assets/images/pokeball.jpg" rel="icon" type="image/x-icon">
-    <link href="https://fonts.gstatic.com" rel="preconnect">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-</head>
-<body id="app-body" class="mat-typography" style="justify-content:space-evenly;text-align:center;">
-<script>
-    (function() {
-        const body = document.getElementById('app-body');
-        const saved = localStorage.getItem('darkMode'); // 'on' | 'off' | null = auto
-        const now = new Date();
-        const hour = now.getHours();
-        const nightStart = 19; // 7 PM
-        const nightEnd = 7;    // 7 AM
-        let dark = false;
-        if (saved === 'on') dark = true;
-        else if (saved === 'off') dark = false;
-        else dark = (hour >= nightStart || hour < nightEnd);
-        if (dark) {
-            body.style.backgroundColor = 'black';
-            body.style.color = '#fff';
-            body.classList.add('dark-theme');
-        } else {
-            body.style.backgroundColor = 'white';
-            body.style.color = '';
-            body.classList.remove('dark-theme');
-        }
-        window.setUserDarkMode = function(mode) {
-            // mode: 'on' | 'off' | 'auto'
-            if (mode === 'auto') localStorage.removeItem('darkMode');
-            else localStorage.setItem('darkMode', mode);
-            // apply immediately
-            const nowHour = new Date().getHours();
-            const applyDark = mode === 'on' || (mode === 'auto' && (nowHour >= nightStart || nowHour < nightEnd));
-            if (applyDark) {
-                body.style.backgroundColor = 'black'; body.style.color = '#fff'; body.classList.add('dark-theme');
-            } else {
-                body.style.backgroundColor = 'white'; body.style.color = ''; body.classList.remove('dark-theme');
-            }
-        };
-    })();
-</script>
-<app-root></app-root><!-- see app-routing.module.ts -->
-</body>
+    <head>
+        <meta charset="utf-8">
+        <title>Pok&#233;dex Angular</title>
+        <base href="/">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
+        <meta content="width=device-width, initial-scale=1" name="viewport">
+        <link href="./assets/images/pokeball.jpg" rel="icon" type="image/x-icon">
+        <link href="https://fonts.gstatic.com" rel="preconnect">
+        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <!-- Icons @: https://fonts.google.com/icons -->
+        <!-- Update CDN Links periodically for PopperJS, Bootstrap, Font Awesome -->
+        <script crossorigin="anonymous"
+                integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+                src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+        <script crossorigin="anonymous"
+                integrity="sha384-7qAoOXltbVP82dhxHAUje59V5r2YsVfBafyUDxEdApLPmcdhBPg1DKg1ERo0BZlK"
+                src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.min.js"></script>
+        <!-- These must be jquery min, jquery modal-min in this order -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+        <script crossorigin="anonymous"
+                integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
+                referrerpolicy="no-referrer"
+                src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+        <script crossorigin="anonymous"
+                integrity="sha512-ztxZscxb55lKL+xmWGZEbBHekIzy+1qYKHGZTWZYH1GUwxy0hiA18lW6ORIMj4DHRgvmP/qGcvqwEyFFV7OYVQ=="
+                referrerpolicy="no-referrer"
+                src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.2/jquery.modal.min.js"></script>
+    </head>
+
+    <body class="mat-typography"
+          id="body"
+          style="justify-content:space-evenly;text-align:center;">
+
+        <app-root></app-root><!-- see app-routing.module.ts -->
+    </body>
 </html>
 <!-- <body class="mat-typography">
   <app-root></app-root>

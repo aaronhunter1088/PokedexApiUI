@@ -1,7 +1,9 @@
 import {Component, OnChanges, OnInit} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
-import {Event, NavigationEnd, NavigationError, NavigationStart, Router} from '@angular/router';
+import {ActivatedRoute, Event, NavigationEnd, NavigationError, NavigationStart, Router} from '@angular/router';
 import {PokemonService} from "./services/pokemon.service";
+import {DarkModeService} from "./services/dark-mode.service";
+import {environment} from "../environments/environment";
 
 @Component({
     selector: 'app-root',
@@ -15,7 +17,9 @@ export class AppComponent implements OnInit, OnChanges {
     previousRoute: string;
     title = 'PokedexHome'
 
-    constructor(private router: Router, private pokemonService: PokemonService, private http: HttpClient) {
+    constructor(private router: Router, private pokemonService: PokemonService, private http: HttpClient,
+                private activatedRoute: ActivatedRoute, private darkModeService: DarkModeService
+    ) {
         this.currentRoute = "";
         this.previousRoute = "";
         this.router.events.subscribe((event: Event) => {
@@ -41,7 +45,14 @@ export class AppComponent implements OnInit, OnChanges {
     }
 
     ngOnInit(): void {
-
+        // Read darkmode query parameter from URL
+        this.activatedRoute.queryParams.subscribe(params => {
+            const darkModeParam = params['darkmode'];
+            if (darkModeParam !== undefined) {
+                const isDarkMode = darkModeParam === 'true' || darkModeParam === true;
+                this.darkModeService.setDarkMode(isDarkMode);
+            }
+        });
     }
 
     ngOnChanges() {

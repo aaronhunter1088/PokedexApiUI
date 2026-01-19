@@ -109,8 +109,7 @@ export class PokedexComponent implements OnInit, OnChanges {
                             .then((locations: any) => {
                                 if (locations.length == 0) {
                                     this.pokemonLocations.push("No known locations!")
-                                }
-                                else {
+                                } else {
                                     locations.forEach((location: any) => {
                                         let names = location?.location_area?.name.split("-")
                                         let newName = ''

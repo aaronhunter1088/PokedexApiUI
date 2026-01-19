@@ -1,5 +1,6 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
+
 //import {Pokedex} from 'pokeapi-js-wrapper';
 
 @Injectable({
@@ -16,11 +17,11 @@ export class PokemonService {
     constructor(protected http: HttpClient) {
     }
 
-    async getPokemonList(_limit: number, _offset: number) : Promise<object | undefined> {
+    async getPokemonList(_limit: number, _offset: number): Promise<object | undefined> {
         return await this.callURL(this.POKEAPI_CONTEXT_BASE + "/pokemon?limit=" + _limit + "&offset=" + _offset);
     }
 
-    async getPokemonSpecificData(pokemonName: string | number) : Promise<object | undefined> {
+    async getPokemonSpecificData(pokemonName: string | number): Promise<object | undefined> {
         //return this.servicePokedex.getPokemonByName(pokemonName);
         console.log("Calling getPokemonSpecificData for: ", pokemonName);
         return await this.callURL(this.POKEAPI_CONTEXT_BASE + "/pokemon/" + pokemonName);
@@ -30,7 +31,7 @@ export class PokemonService {
         console.debug("calling species URL: ", pokemon?.species?.url);
         //return await this.callURL(pokemon?.species?.url); // no base needed on actual urls
         return new Promise((resolve, reject) => {
-            this.http.get(pokemon?.species?.url, { params: {} }).subscribe({
+            this.http.get(pokemon?.species?.url, {params: {}}).subscribe({
                 next: (res) => resolve(res),
                 error: (err) => reject(err)
             });
@@ -53,7 +54,7 @@ export class PokemonService {
         }
         console.log("calling URL: ", url);
         return new Promise((resolve, reject) => {
-            this.http.get(url, { params: interval }).subscribe({
+            this.http.get(url, {params: interval}).subscribe({
                 next: (res) => resolve(res),
                 error: (err) => reject(err)
             });
