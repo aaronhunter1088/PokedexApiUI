@@ -21,6 +21,7 @@ export class PokemonListComponent implements OnInit {
     showGifs: boolean = false;
     gifImagePresent: boolean = false;
     landingPageUrl: string = environment.landingPageUrl;
+    hostUrl: string = environment.hostUrl;
 
     constructor(private pokemonService: PokemonService, private http: HttpClient,
                 private darkModeService: DarkModeService) {
@@ -205,7 +206,7 @@ export class PokemonListComponent implements OnInit {
      */
     navigateToLandingPage(): void {
         const currentDarkMode = this.darkModeService.getDarkMode();
-        const url = `${this.landingPageUrl}?darkmode=${currentDarkMode}`;
+        const url = `${this.landingPageUrl}?tileNumber=3&darkmode=${currentDarkMode}`;
         window.location.href = url;
     }
 }

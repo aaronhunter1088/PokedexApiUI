@@ -1,5 +1,6 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
+import {environment} from "../../environments/environment";
 
 //import {Pokedex} from 'pokeapi-js-wrapper';
 
@@ -12,19 +13,20 @@ export class PokemonService {
     savedPageNumber: number = 1;
     pokemonID: number = 0;
     itemsPerPage: number = 10
-    POKEAPI_CONTEXT_BASE = "/pokedexapi";
+    //POKEAPI_CONTEXT_BASE = "/pokedexapi";
+    hostUrl: string = environment.hostUrl;
 
     constructor(protected http: HttpClient) {
     }
 
     async getPokemonList(_limit: number, _offset: number): Promise<object | undefined> {
-        return await this.callURL(this.POKEAPI_CONTEXT_BASE + "/pokemon?limit=" + _limit + "&offset=" + _offset);
+        return await this.callURL(this.hostUrl + "/pokemon?limit=" + _limit + "&offset=" + _offset);
     }
 
     async getPokemonSpecificData(pokemonName: string | number): Promise<object | undefined> {
         //return this.servicePokedex.getPokemonByName(pokemonName);
         console.log("Calling getPokemonSpecificData for: ", pokemonName);
-        return await this.callURL(this.POKEAPI_CONTEXT_BASE + "/pokemon/" + pokemonName);
+        return await this.callURL(this.hostUrl + "/pokemon/" + pokemonName);
     }
 
     async getPokemonSpecies(pokemon: any): Promise<object | undefined> {
@@ -43,13 +45,13 @@ export class PokemonService {
     }
 
     async getPokemonChainData(pokemonChainID: string): Promise<object> {
-        return await this.callURL(this.POKEAPI_CONTEXT_BASE + "/evolution-chain/" + pokemonChainID);
+        return await this.callURL(this.hostUrl + "/evolution-chain/" + pokemonChainID);
     }
 
     async callURL(url: any, interval: any = {}): Promise<any> {
         let prodBase = "https://pokeapi.co/api/v2";
         if (url.startsWith(prodBase)) {
-            url = this.POKEAPI_CONTEXT_BASE + url.split(prodBase)[1];
+            url = this.hostUrl + url.split(prodBase)[1];
             console.debug("URL converted to local API URL", url);
         }
         console.log("calling URL: ", url);
