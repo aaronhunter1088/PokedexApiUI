@@ -50,7 +50,7 @@ ng serve
 - **Default port**: 4203 (configured in angular.json)
 - **URL**: http://localhost:4203/
 - The application automatically reloads when source files change
-- Uses proxy.conf.js to redirect API calls to the backend server
+- Uses environments to redirect API calls to the backend server
 
 ### Building the Application
 
@@ -143,7 +143,7 @@ ng generate directive|pipe|service|class|guard|interface|enum|module
 ### Key Files
 
 - **angular.json**: Configures build, serve, and test options. Port 4203 is set here. Proxy configuration is referenced for both development and production serve modes.
-- **proxy.conf.js**: Currently commented out. Previously configured to route `/pokedexapi/**` requests to backend (http://mypokedex.us/pokedexapi or https://pokeapi.co/api/v2 based on POKEDEX_PROXY env var).
+- **proxy.conf.js**: No longer used. Left to show how it worked before environments were introduced.
 - **app.module.ts**: Main application module that imports Angular Material, HTTP client, pagination, and routing modules. Declares all components and provides PokemonService.
 - **app-routing.module.ts**: Defines application routes.
 - **tsconfig.json**: Strict mode enabled, targets ES2022, uses bundler module resolution.
