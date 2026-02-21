@@ -13,6 +13,7 @@ import {OrderModule} from "ngx-order-pipe";
 import {ArraySortPipe} from './array-sort.pipe';
 import {EvolvesHowComponent} from './evolves-how/evolves-how.component';
 import {PokemonService} from './services/pokemon.service';
+import {MobileMenuComponent} from "./mobile-menu/mobile-menu.component";
 
 @NgModule({
     declarations: [
@@ -31,7 +32,8 @@ import {PokemonService} from './services/pokemon.service';
         NgxPaginationModule,
         MatSlideToggleModule,
         BrowserAnimationsModule,
-        OrderModule
+        OrderModule,
+        MobileMenuComponent
     ],
     exports: [
         BrowserModule,
