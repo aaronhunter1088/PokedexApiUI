@@ -48,6 +48,17 @@ Run `ng generate component component-name` to generate a new component. You can 
 
 Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
 
+Run `ng build-server` to build the project for server-side rendering. The build artifacts will be 
+stored in the `dist/` directory. The pokedexapiui folder will contain a /broswer directory. That
+is what will be uploaded to the server. All files inside will be extracted and moved into the
+/combined directory.
+Login to the server using sftp. 
+Execute put -r (/dist)/pokedexapiui /opt/tomcat11/combined
+This should successfully upload all the files inside the pokedexapiui folder to the server. Extract the files
+in the /browser directory and move them up one level to the /combined directory. 
+Delete the pokedexapiui folder and the browser folder.
+The server will need to be configured to serve the files in the combined directory.
+
 ## Running unit tests
 
 Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).

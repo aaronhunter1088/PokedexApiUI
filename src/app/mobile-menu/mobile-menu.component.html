@@ -1,0 +1,142 @@
+<!-- Mobile Header -->
+<div class="mobile-header {{currentDarkMode?'darkmode':'lightmode'}}">
+    <div class="pokemon-logo">
+        <a routerLink="/search">
+            <img alt="pokedex" src="../../assets/images/pokedexImage.jpg">
+        </a>
+    </div>
+    <button class="mobile-menu-button" (click)="toggleMobileMenu();" aria-label="Menu">
+        <i class="fa-solid fa-ellipsis-vertical"></i>
+    </button>
+</div>
+
+<!-- Mobile Menu Overlay -->
+<div class="mobile-menu-overlay" id="mobileMenuOverlay" (click)="closeMobileMenu();"></div>
+
+<!-- Mobile Menu -->
+<div class="mobile-menu {{currentDarkMode?'darkmode':'lightmode'}}" id="mobileMenu">
+    <button class="mobile-menu-close" (click)="closeMobileMenu();" aria-label="Close menu">
+        <i class="fa-solid fa-times"></i>
+    </button>
+
+    <div class="mobile-menu-item mobile-gif-item">
+        <label>Show GIFs</label>
+        <label class="switch" title="If GIF is not present, official artwork will show!">
+            <input type="checkbox" [checked]="showGifs" (change)="toggleShowGifs(); closeMobileMenu();">
+            <span class="slider round"></span>
+        </label>
+    </div>
+
+    <div class="mobile-menu-item mobile-gif-item">
+        <label>{{currentDarkMode ? 'Turn on Light Mode' : 'Turn on Dark Mode'}}</label>
+        <label class="switch" title="Toggle darkmode">
+            <input id="gifSwitchDarkmode" type="checkbox" [checked]="currentDarkMode" (change)="toggleDarkmode(); closeMobileMenu();">
+            <span class="slider round"></span>
+        </label>
+    </div>
+
+    <div class="mobile-menu-item mobile-gif-item">
+        <label for="searchMobile">Search for Pkmn</label>
+        <input #searchMobile
+               name="searchMobile" type="text" placeholder="Name or ID"
+               (input)="onInput(searchMobile.value)"
+        />
+        <button (click)="navigateToPokedex();">
+            <img alt="Get Pokémon"
+                 src="../../assets/images/pokeball1.jpg"
+                 style="width:50px; height:50px; cursor: pointer;"
+                 title="Search for Pkmn">
+        </button>
+    </div>
+
+    <div class="mobile-menu-item">
+        <label for="pageNumberMobile">Jump to Page</label>
+        <input #pageNumberMobile
+               name="pageNumberMobile" type="text" placeholder="Page #"
+               (input)="onPageInput(pageNumberMobile.value)"
+        />
+        <button class="icon" (click)="setPageToView(); pageNumberMobile.value = '';" title="Jump to Page">Go</button>
+    </div>
+
+    <div class="mobile-menu-item">
+        <label for="showPkmnNumberMobile">Pok&#233;mon Per Page</label>
+        <input #showPkmnNumberMobile
+               name="showPkmnNumberMobile" type="text" placeholder="# of PkMn"
+               (input)="onPkmnPerPageInput(showPkmnNumberMobile.value);"
+        />
+        <button class="icon" (click)="setPkmnPerPage(); showPkmnNumberMobile.value = '';" title="Show Pok&#233;mon">Show Pok&#233;mon</button>
+    </div>
+
+    <div class="mobile-menu-item">
+        <label for="typeDropdownMobile">Filter by Type</label>
+        <div id="typeList" style="display:flex; align-items: center; gap: 5px;">
+            <label for="typeDropdown"></label>
+            <select id="typeDropdown" title="Type" class="icon" (change)="showLoadingOverlay(); getByPkmnType($event)">
+                <option value="none" selected>Type (All)</option>
+                @for (type of uniqueTypes; track type) {
+                    @if (chosenType === type) {
+                        <option [value]="type" selected>{{ type }}</option>
+                    } @else {
+                        <option [value]="type">{{ type }}</option>
+                    }
+                }
+            </select>
+        </div>
+    </div>
+
+    <div class="mobile-menu-item">
+        <button class="back-to-landing-btn icon" (click)="navigateToLandingPage()"
+                title="Return to Landing Page">
+            Back to Landing Page
+        </button>
+    </div>
+</div>
+
+
+<!--
+The issue is that you're using inline onclick handlers in an Angular template,
+but the JavaScript functions are defined in a <script> tag. In Angular, these
+functions aren't accessible to the template's inline event handlers because
+Angular components are isolated from global scope.
+
+You need to move these functions to your component's TypeScript file and use
+Angular's event binding instead.
+-->
+<script>
+
+    function setPkmnPerPageMobile() {
+        let value = $("#showPkmnNumberMobile").val();
+        setPkmnPerPageImpl(value, true);
+    }
+
+    function setPkmnPerPageImpl(value, isMobile) {
+        console.log("showPkmnNumber: " + value);
+        $.ajax({
+            type: "GET",
+            url: "pkmnPerPage",
+            data: {
+                pkmnPerPage: value
+            },
+            async: false,
+            dataType: "application/json",
+            crossDomain: true,
+            statusCode: {
+                200: function(data) {
+                    console.log(JSON.parse(JSON.stringify(data.responseText)));
+                    if (isMobile) closeMobileMenu();
+                    location.reload();
+                },
+                400: function(data) {
+                    console.log(JSON.parse(JSON.stringify(data.responseText)));
+                },
+                404: function() {
+                    console.log('Resource not found');
+                },
+                500: function() {
+                    console.log('Server Error');
+                }
+            }
+        });
+    }
+
+</script>

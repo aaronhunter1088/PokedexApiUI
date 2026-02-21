@@ -1,6 +1,7 @@
-import {Component, HostListener, Input, OnChanges, OnInit} from '@angular/core';
+import {Component, HostListener, Input, OnChanges, OnInit, OnDestroy} from '@angular/core';
 import {PokemonService} from "../services/pokemon.service";
 import {ActivatedRoute} from "@angular/router";
+import {DarkModeService} from "../services/dark-mode.service";
 
 @Component({
     selector: 'app-pokedex',
@@ -8,7 +9,7 @@ import {ActivatedRoute} from "@angular/router";
     styleUrls: ['./pokedex.component.css'],
     standalone: false
 })
-export class PokedexComponent implements OnInit, OnChanges {
+export class PokedexComponent implements OnInit, OnChanges, OnDestroy {
     @Input() pokemonSprites = {}
     @Input() pokemonImage = ''
     @Input() pokemonName = ''
@@ -30,11 +31,13 @@ export class PokedexComponent implements OnInit, OnChanges {
     screenWidth: number = 0
     screenHeight: number = 0
     styleFlag: boolean = false
-    showGifs: boolean = false
     gifImage: string = ''
     officialImage: string = ''
+    currentDarkMode: boolean = false
+    showGifs: boolean = false;
 
-    constructor(private route: ActivatedRoute, private pokemonService: PokemonService) {
+    constructor(private route: ActivatedRoute, private pokemonService: PokemonService,
+                private darkmodeService: DarkModeService) {
     }
 
     ngOnInit(): void {
@@ -42,6 +45,8 @@ export class PokedexComponent implements OnInit, OnChanges {
         document.getElementById('defaultImgBtn').style.fontWeight = this.bold
         // @ts-ignore
         document.getElementById('descriptionBtn').style.fontWeight = this.bold
+        this.currentDarkMode = this.darkmodeService.isDarkMode();
+        this.showGifs = this.pokemonService.getShowGifs();
 
         this.screenWidth = window.innerWidth
         this.screenHeight = window.innerHeight
@@ -52,20 +57,20 @@ export class PokedexComponent implements OnInit, OnChanges {
             //console.log("pokemonID", this.pokemonID);
             if (Object.keys(params).length !== 0) {
                 //console.log("params keys.length: ", Object.keys(params).length)
-                this.pokemonID = <number>params['pokemonID']
+                this.pokemonID = Number(window.location.pathname.split('/').pop()?.trim() || 0)
             }
+            if (this.pokemonID === undefined) this.pokemonID = <number>params['pokemonID']
             if (Number.parseInt(<string>this.pokemonID) > 0) {
                 //console.log("chosen pokemon with ID: '" + this.pokemonID + "'")
                 this.pokemonDescription = ''
                 this.pokemonLocations = []
                 this.pokemonMoves = []
-                this.pokemonService.getPokemonSpecificData(this.pokemonID)
+                this.pokemonService.getPokemonByName(this.pokemonID)
                     .then((pokemon: any) => {
                         //console.log("pokemon: ", pokemon)
                         this.pokemonName = pokemon.name
                         //console.log("name: " + pokemon.name)
                         let sprites = pokemon['sprites']//<object>pokemon['sprites']
-                        //sprites.official = sprites.official;
                         pokemon['sprites'] = sprites;
                         this.pokemonSprites = sprites;
                         let species = pokemon['species']
@@ -73,7 +78,6 @@ export class PokedexComponent implements OnInit, OnChanges {
                         this.pokemonImage = this.pokemonImage != null ? this.pokemonImage : "./assets/images/pokeball1.jpg"
                         this.gifImage = pokemon['sprites']['versions']['generation-v']['black-white']['animated']['front_default']
                         this.officialImage = pokemon['sprites']['other']['official-artwork']['front_default']
-                        //this.pokemonName = pokemon.name
                         this.pokemonID = pokemon.id
                         // edit weight
                         let weight = pokemon.weight.toString()
@@ -86,10 +90,10 @@ export class PokedexComponent implements OnInit, OnChanges {
                         else height = height.slice(0, -1) + '.' + height.slice(-1)
                         this.pokemonHeight = height
                         // get and set color, and pokemon description
-                        this.pokemonService.getPokemonSpecies(pokemon)
+                        this.pokemonService.getPokemonSpeciesData(pokemon)
                             .then((speciesData: any) => {
                                 //console.log("pokemon species: ", speciesData);
-                                this.pokemonColor = speciesData.color.name;
+                                this.pokemonColor = speciesData['color']['name'];
                                 this.changeColor(this.pokemonColor);
                                 this.pokemonDescriptions = speciesData.flavor_text_entries;
                                 this.pokemonDescription = this.getEnglishDescriptions();
@@ -105,25 +109,23 @@ export class PokedexComponent implements OnInit, OnChanges {
                             this.pokemonType = this.pokemonType[0].type.name[0].toUpperCase() + this.pokemonType[0].type.name.substring(1)
                         }
                         // locations
-                        this.pokemonService.getPokemonLocationEncounters(pokemon.location_area_encounters)
-                            .then((locations: any) => {
+                        this.pokemonService.getPokemonLocationEncounters(this.pokemonID.toString()).then(
+                            (locations: any) => {
                                 if (locations.length == 0) {
                                     this.pokemonLocations.push("No known locations!")
                                 } else {
                                     locations.forEach((location: any) => {
-                                        let names = location?.location_area?.name.split("-")
+                                        let names = location['location_area']['name'].split("-")
                                         let newName = ''
                                         names.forEach((name: string) => {
                                             name = name[0].toUpperCase() + name.substring(1)
                                             newName += name + " "
+                                            //console.log(newName);
                                         })
                                         this.pokemonLocations.push(newName)
                                     })
                                     this.pokemonLocations.sort()
                                 }
-                            })
-                            .catch((error: any) => {
-                                console.error("Couldn't get Pokemon locations with: '" + this.pokemonID + "'", error)
                             });
                         // moves
                         let allMoves = pokemon['moves']
@@ -139,7 +141,8 @@ export class PokedexComponent implements OnInit, OnChanges {
                         this.pokemonMoves.sort()
                     })
                     .catch((error: any) => {
-                        console.error("Couldn't get Pokemon info with: '" + this.pokemonID + "'", error)
+                        console.log("Couldn't get Pokemon info with: '" + this.pokemonID + "'")
+                        console.log(error)
                     })
                 this.ngOnChanges()
             } else {
@@ -149,24 +152,29 @@ export class PokedexComponent implements OnInit, OnChanges {
     }
 
     @HostListener('window:resize', ['$event'])
-    onResize(event: any) {
-        this.screenWidth = window.innerWidth;
-        this.screenHeight = window.innerHeight;
+    onResize(event?: UIEvent) {
+        const winConst = (event?.currentTarget ?? window) as Window;
+        this.screenWidth = winConst.innerWidth;
+        this.screenHeight = winConst.innerHeight;
         //console.log("w: " + this.screenWidth + " h: " + this.screenHeight);
         this.styleFlag = this.screenWidth > 400 && this.screenHeight > 400;
     }
 
     ngOnChanges() {
-        //console.log("changes")
+        //console.log("ngOnChanges")
         this.setDivsToNotShow()
         this.descriptionDiv = true
-        document.body.style.backgroundColor = "#ffffff"
+        // Don't override body background - let dark mode service handle it
         this.setImageButtonsToNormalFont()
         // @ts-ignore
         document.getElementById('defaultImgBtn').style.fontWeight = this.bold
         this.setButtonsToNormalFont()
         // @ts-ignore
         document.getElementById('descriptionBtn').style.fontWeight = this.bold
+    }
+
+    ngOnDestroy() {
+        this.pokemonService.saveShowGifs(this.showGifs);
     }
 
     showImage(option: string): void {
@@ -268,7 +276,7 @@ export class PokedexComponent implements OnInit, OnChanges {
         this.evolutionsDiv = true
         this.setButtonsToNormalFont()
         // @ts-ignore
-        document.getElementById('evolutionsBtn').style.fontWeight = this.bold
+        document.getElementById('evolvesHowBtn').style.fontWeight = this.bold
     }
 
     setDivsToNotShow() {
@@ -295,7 +303,7 @@ export class PokedexComponent implements OnInit, OnChanges {
         // @ts-ignore
         document.getElementById('movesBtn').style.fontWeight = this.normal
         // @ts-ignore
-        document.getElementById('evolutionsBtn').style.fontWeight = this.normal
+        document.getElementById('evolvesHowBtn').style.fontWeight = this.normal
     }
 
     changeColor(pokemonColor: string): string {

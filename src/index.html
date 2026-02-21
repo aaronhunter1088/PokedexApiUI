@@ -2,7 +2,7 @@
 <html lang="en">
     <head>
         <meta charset="utf-8">
-        <title>Pok&#233;dex Angular</title>
+        <title id="page-title">Pok&#233;dex Combined</title>
         <base href="/">
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
         <meta content="width=device-width, initial-scale=1" name="viewport">
@@ -41,3 +41,14 @@
   <app-root></app-root>
 </body>
 </html> -->
+<script>
+    window.addEventListener('DOMContentLoaded', () => {
+        const titles = ['Pokédex Angular', 'Pokédex Springboot'];
+        let currentIndex = 0;
+
+        setInterval(() => {
+            currentIndex = (currentIndex + 1) % titles.length;
+            document.getElementById('page-title').textContent = titles[currentIndex];
+        }, 2000);
+    });
+</script>
