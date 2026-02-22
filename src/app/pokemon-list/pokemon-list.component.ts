@@ -223,7 +223,7 @@ export class PokemonListComponent implements OnInit {
      */
     navigateToLandingPage(): void {
         const currentDarkMode = this.darkModeService.isDarkMode();
-        const url = `${this.landingPageUrl}?tileNumber=2&darkmode=${currentDarkMode}`;
+        const url = `${this.landingPageUrl}?tileNumber=3&darkmode=${currentDarkMode}`;
         window.location.href = url;
     }
 
