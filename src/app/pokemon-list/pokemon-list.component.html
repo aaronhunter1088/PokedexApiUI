@@ -90,7 +90,7 @@
 </div>
 
 <pagination-controls
-        (pageChange)="this.page=$event; pokemonMap = newMap(); getThePokemon();"
+        (pageChange)="this.page=$event; getThePokemon();"
         [maxSize]="this.pkmnPerPage"
         style="justify-content: space-evenly;">
 </pagination-controls>
@@ -163,6 +163,6 @@
     }
 </div>
 <pagination-controls
-        (pageChange)="this.page=$event; pokemonMap = newMap(); getThePokemon();"
+        (pageChange)="this.page=$event; getThePokemon();"
         [maxSize]="this.pkmnPerPage"
         style="justify-content: space-evenly;"></pagination-controls>

@@ -1,46 +1,41 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
-import {NamedAPIResourceList, Pokedex, Pokemon, PokemonSpecies} from "pokeapi-js-wrapper";
+import {NamedAPIResourceList, Pokemon, PokemonSpecies} from "pokeapi-js-wrapper";
 import {environment} from "../../environments/environment";
 
 @Injectable({
     providedIn: 'root'
 })
-export class PokemonService {
-
-    //servicePokedex = new Pokedex();
+export class PokemonService
+{
     savedPageNumber: number = 1;
     pokemonID: number = 0;
     pkmnPerPage: number = 10
     allPokemon: any[] = [];
     showGifs: boolean = false;
-    //POKEAPI_CONTEXT_BASE = "/pokedexapi";
+    chosenType: string = 'none';
     hostUrl: string = environment.hostUrl;
 
     constructor(protected http: HttpClient) {
     }
 
     getPokemonList(_limit: number, _offset: number): Promise<NamedAPIResourceList> {
-        const interval = {
-            limit: _limit,
-            offset: _offset
-        }
         return this.callURL(this.hostUrl + "/pokemon?limit=" + _limit + "&offset=" + _offset);
     }
 
     async getPokemonSpecificData(pokemonName: string | number): Promise<Pokemon> {
         //return this.servicePokedex.getPokemonByName(pokemonName);
-        console.log("Calling getPokemonSpecificData for: ", pokemonName);
+        //console.log("Calling getPokemonSpecificData for: ", pokemonName);
         return await this.callURL(this.hostUrl + "/pokemon/" + pokemonName);
     }
 
     getPokemonByName(pokemonIDName: string | number) {
-        console.log("Calling getPokemonByName for: ", pokemonIDName);
+        //console.log("Calling getPokemonByName for: ", pokemonIDName);
         return this.callURL(this.hostUrl + "/pokemon/" + pokemonIDName);
     }
 
     async getPokemonSpeciesData(pokemon: any): Promise<object | undefined> {
-        console.debug("calling species URL: ", pokemon?.species?.url);
+        //console.debug("calling species URL: ", pokemon?.species?.url);
         //return await this.callURL(pokemon?.species?.url); // no base needed on actual urls
         return new Promise((resolve, reject) => {
             this.http.get(pokemon?.species?.url, {params: {}}).subscribe({
@@ -56,6 +51,7 @@ export class PokemonService {
     async fetchPokemonByType(chosenType: string) {
         const pokemonList: any[] = [];
 
+        console.log('allpokemon length: ', this.allPokemon.length);
         try {
             this.allPokemon?.forEach((pokemon: any) => {
                 if (chosenType === 'none' ||
@@ -64,6 +60,7 @@ export class PokemonService {
                     pokemonList.push(pokemon);
                 }
             });
+            this.chosenType = chosenType;
         }
         catch (error) {
             //console.error(`Error fetching Pokemon list at offset ${offset}`, error);
@@ -76,12 +73,13 @@ export class PokemonService {
     async collectPokemonData() {
         console.log("Collecting Pokemon data...");
         let offset = (this.savedPageNumber - 1) * this.pkmnPerPage;
-        const limit = this.pkmnPerPage;
+        const limit = 1500;
         if (this.allPokemon.length === 0) {
             let pokemonList = await this.getPokemonList(limit, offset)
                 .then((pokemonListData => { return pokemonListData }))
             let pokemon: Pokemon;
             let species: PokemonSpecies;
+            // @ts-ignore
             // @ts-ignore
             for (const p of pokemonList['results']) {
                 pokemon = <Pokemon>await this.getPokemonSpecificData(p.name).then((pokemonData => {
@@ -110,7 +108,7 @@ export class PokemonService {
                     //if (height.length == 1) height = "0." + height
                     //else height = height.slice(0, -1) + '.' + height.slice(-1)
                     pokemon['height'] = Number(height);
-                    this.allPokemon = [...this.allPokemon, pokemon];
+                    this.allPokemon.push(pokemon);
                 } else {
                     console.error("Error fetching data for " + p.name + ": Pokemon or species data is undefined");
                 }
@@ -160,9 +158,9 @@ export class PokemonService {
         let prodBase = "https://pokeapi.co/api/v2";
         if (url.startsWith(prodBase)) {
             url = this.hostUrl + url.split(prodBase)[1];
-            console.debug("URL converted to local API URL", url);
+            //console.debug("URL converted to local API URL", url);
         }
-        console.log("calling URL: ", url);
+        //console.log("calling URL: ", url);
         return new Promise((resolve, reject) => {
             this.http.get(url, {params: interval}).subscribe({
                 next: (res) => resolve(res),
@@ -196,12 +194,21 @@ export class PokemonService {
 
     // Show GIFs toggle functions
     saveShowGifs(showGifs: boolean) {
-        console.log("saving showGifs: ", showGifs);
+        //console.log("saving showGifs: ", showGifs);
         this.showGifs = showGifs;
     }
 
     getShowGifs(): boolean {
         return this.showGifs;
+    }
+
+    saveChosenType(chosenType: string) {
+        console.log("saving chosenType: ", chosenType);
+        this.chosenType = chosenType;
+    }
+
+    getChosenType(): string {
+        return this.chosenType;
     }
 
     getEvolutionsMap() {
