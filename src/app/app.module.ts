@@ -14,6 +14,7 @@ import {ArraySortPipe} from './array-sort.pipe';
 import {EvolvesHowComponent} from './evolves-how/evolves-how.component';
 import {PokemonService} from './services/pokemon.service';
 import {MobileMenuComponent} from "./mobile-menu/mobile-menu.component";
+import {NgOptimizedImage} from "@angular/common";
 
 @NgModule({
     declarations: [
@@ -33,7 +34,8 @@ import {MobileMenuComponent} from "./mobile-menu/mobile-menu.component";
         MatSlideToggleModule,
         BrowserAnimationsModule,
         OrderModule,
-        MobileMenuComponent
+        MobileMenuComponent,
+        NgOptimizedImage
     ],
     exports: [
         BrowserModule,
