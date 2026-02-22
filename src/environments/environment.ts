@@ -1,5 +1,5 @@
 export const environment = {
     production: true,
     landingPageUrl: 'https://mypokedex.us',
-    hostUrl: 'https://mypokedex.us/combined'
+    hostUrl: 'https://mypokedex.us/springboot'
 };
