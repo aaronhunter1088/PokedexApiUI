@@ -109,7 +109,7 @@ img {
 }
 
 /* Mobile Media Query */
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 650px) {
     /* Hide desktop controls */
     .desktop-controls {
         display: none !important;
