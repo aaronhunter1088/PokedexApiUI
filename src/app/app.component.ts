@@ -1,9 +1,6 @@
 import {Component, OnChanges, OnInit} from '@angular/core';
-import {HttpClient} from "@angular/common/http";
 import {ActivatedRoute, Event, NavigationEnd, NavigationError, NavigationStart, Router} from '@angular/router';
-import {PokemonService} from "./services/pokemon.service";
 import {DarkModeService} from "./services/dark-mode.service";
-import {environment} from "../environments/environment";
 
 @Component({
     selector: 'app-root',
@@ -17,8 +14,10 @@ export class AppComponent implements OnInit, OnChanges {
     previousRoute: string;
     title = 'PokedexHome'
 
-    constructor(private router: Router, private pokemonService: PokemonService, private http: HttpClient,
-                private activatedRoute: ActivatedRoute, private darkModeService: DarkModeService
+    constructor(
+        private router: Router,
+        private activatedRoute: ActivatedRoute,
+        private darkModeService: DarkModeService
     ) {
         this.currentRoute = "";
         this.previousRoute = "";
@@ -42,6 +41,7 @@ export class AppComponent implements OnInit, OnChanges {
                 console.log(event.error);
             }
         });
+
     }
 
     ngOnInit(): void {
