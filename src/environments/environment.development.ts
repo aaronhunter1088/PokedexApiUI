@@ -10,6 +10,6 @@ export const environment = {
         const host = window.location.hostname;
         const proto = window.location.protocol; // "http:" or "https:"
         const apiPort = proto === 'http:' ? ':4204' : ''; // same here, but you can customize
-        return `${proto}//${host}${apiPort}/combined`;
+        return `${proto}//${host}${apiPort}/pokedexapi`;
     }
 };
