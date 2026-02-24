@@ -50,26 +50,25 @@ export class PokemonListComponent implements OnInit {
             // update pokemonMap by emptying it first.
             this.pokemonMap.clear();
             // @ts-ignore
-            if (!this.filteringInProgress.get(this.chosenType) || !this.filteredPokemonByType.has(this.chosenType)) {
+            if (!this.filteringInProgress.get(this.chosenType) && this.filteredPokemonByType.has(this.chosenType)) {
                 // @ts-ignore
                 await this.filterByType(this.chosenType)
             }
         }
 
-        if (!this.retroactiveFetchingStarted) {
-            this.pokemonService.collectPokemonData().then(() => {
-                this.getThePokemon().then(r =>
-                    console.log("pokemonMap size: " + this.pokemonMap.size)
-                );
+        await this.pokemonService.getTotalPokemon("1").then(count => { this.numberOfPokemon = count; });
+        console.log("loading numberOfPokemon: ", this.numberOfPokemon);
+        this.getThePokemon();
+        console.log("pokemonMap size: " + this.pokemonMap.size);
+        //this.pokemonService.collectPokemonData(this.numberOfPokemon);
 
-                console.log("Dark mode is ", this.currentDarkMode);
-                console.log("Show GIFs is ", this.showGifs);
-                this.startRetroactiveFetchingByType();
-            });
-        }
+        console.log("Dark mode is ", this.currentDarkMode);
+        console.log("Show GIFs is ", this.showGifs);
 
-
-
+        // TODO: Fix. This is overloading the system.
+        // if (!this.retroactiveFetchingStarted) {
+        //     this.startRetroactiveFetchingByType();
+        // }
     }
 
     ngOnReload() {
@@ -77,6 +76,7 @@ export class PokemonListComponent implements OnInit {
         this.pkmnPerPage = this.pokemonService.getNumberOfPokemonPerPage();
         this.showGifs = this.pokemonService.getShowGifs();
         this.currentDarkMode = this.darkModeService.isDarkMode();
+        // TODO: Fix. Appears to not retain chosenType on reload, but should. Should work similarly to savedPage or pkmnPerPage.
         this.chosenType = this.pokemonService.getChosenType();
     }
 
@@ -91,43 +91,46 @@ export class PokemonListComponent implements OnInit {
         console.log('page number is ', this.page);
         console.log('pkmnPerPage: ', this.pkmnPerPage);
         console.log('chosenType: ', this.chosenType);
-        if (this.chosenType !== 'none') {
-            // @ts-ignore
-            if (this.filteredPokemonByType.has(this.chosenType) && this.filteredPokemonByType.get(this.chosenType)?.length >= this.pokemonService.pkmnPerPage) {
-                console.log('filtering not in progress');
-                let skipCount = (this.page - 1) * this.pkmnPerPage;
-                console.log("skipCount: " + skipCount);
-                let added = 0;
-                let typedList = this.filteredPokemonByType.get(this.chosenType);
-                if (typedList && typedList?.length >= this.pokemonService.pkmnPerPage) {
-                    this.pokemonMap.clear();
-                    for(let i = 0; i < typedList.length; i++) {
-                        if (i < skipCount) {
-                            // skip
-                        } else {
-                            if (added < this.pkmnPerPage) {
-                                let pkmn = typedList[i];
-                                console.debug("adding pkmn to pokemonMap: " + JSON.stringify(pkmn.name));
-                                this.pokemonMap.set(pkmn.id, pkmn);
-                                added++;
-                            }
-                        }
-                        if (this.pokemonMap.size === this.pkmnPerPage) break;
-                    }
-                } else {
-                    await this.gatherPokemon();
-                }
-            }
-            else {
-
-                this.pokemonService.saveChosenType(this.chosenType);
-                //await this.gatherPokemon();
-            }
-        }
-        else {
-            //this.pokemonMap = this.newMap();
-            await this.gatherPokemon();
-        }
+        await this.gatherPokemon();
+        // TODO: Move logic into method for later re-use
+        // if (this.chosenType !== 'none') {
+        //     // @ts-ignore
+        //     if (this.filteredPokemonByType.has(this.chosenType) && this.filteredPokemonByType.get(this.chosenType)?.length >= this.pokemonService.pkmnPerPage) {
+        //         console.log('filtering not in progress');
+        //         let skipCount = (this.page - 1) * this.pkmnPerPage;
+        //         console.log("skipCount: " + skipCount);
+        //         let added = 0;
+        //         let typedList = this.filteredPokemonByType.get(this.chosenType);
+        //         if (typedList && typedList?.length >= this.pokemonService.pkmnPerPage) {
+        //             this.pokemonMap.clear();
+        //             for(let i = 0; i < typedList.length; i++) {
+        //                 if (i < skipCount) {
+        //                     // skip
+        //                 } else {
+        //                     if (added < this.pkmnPerPage) {
+        //                         let pkmn = typedList[i];
+        //                         console.debug("adding pkmn to pokemonMap: " + JSON.stringify(pkmn.name));
+        //                         this.pokemonMap.set(pkmn.id, pkmn);
+        //                         added++;
+        //                     }
+        //                 }
+        //                 if (this.pokemonMap.size === this.pkmnPerPage) break;
+        //             }
+        //         }
+        //         else {
+        //             await this.gatherPokemon();
+        //         }
+        //     }
+        //     else {
+        //
+        //         this.pokemonService.saveChosenType(this.chosenType);
+        //         await this.gatherPokemon();
+        //     }
+        // }
+        // else {
+        //     //this.pokemonMap = this.newMap();
+        //     await this.gatherPokemon();
+        // }
         this.blankPageNumber = '';
     }
 
@@ -365,14 +368,34 @@ export class PokemonListComponent implements OnInit {
                 let typedList = await this.pokemonService.fetchPokemonByType(selectedType).then(r => {
                     return r;
                 })
-                this.numberOfPokemon = typedList.length;
                 this.filteredPokemonByType.set(selectedType, typedList);
-                while (this.pokemonMap.size < this.pokemonService.getNumberOfPokemonPerPage()) {
-                    await this.getThePokemon();
+                let added = 0;
+                while (added < this.pokemonService.getNumberOfPokemonPerPage()) {
+                    let skipCount = (this.page - 1) * this.pkmnPerPage;
+                    console.log("skipCount: " + skipCount);
+                    console.log("typedList size: " + typedList.length);
+                    this.pokemonMap.clear();
+                    for(let i = 0; i < typedList.length; i++) {
+                        if (skipCount > 0 && i < skipCount) {
+                            // skip
+                        } else {
+                            if (added < this.pkmnPerPage) {
+                                let pkmn = typedList[i];
+                                console.debug("adding pkmn to pokemonMap: " + JSON.stringify(pkmn.name));
+                                this.pokemonMap.set(pkmn.id, pkmn);
+                                added++;
+                            }
+                        }
+                        if (this.pokemonMap.size === this.pkmnPerPage) break;
+                    }
+                    // if (typedList?.length >= this.pokemonService.pkmnPerPage) {
+                    //
+                    // }
                     console.log("pokemonMap size: " + this.pokemonMap.size);
                     this.pkmnPerPage += this.pokemonService.getNumberOfPokemonPerPage();
                 }
                 this.pkmnPerPage = this.pokemonService.getNumberOfPokemonPerPage();
+                this.numberOfPokemon = typedList.length;
                 this.hideLoadingOverlay();
             }
         }
@@ -487,48 +510,48 @@ export class PokemonListComponent implements OnInit {
 
     async gatherPokemon() {
         try {
-            //const pokemonListResponse = await this.pokemonService.getPokemonList(this.pkmnPerPage, (this.page - 1) * this.pkmnPerPage);
+            this.pokemonMap.clear();
 
-            const pokemonListResponse = this.pokemonService.allPokemon;
-            this.numberOfPokemon = pokemonListResponse.length;
+            const pokemonListResponse = await this.pokemonService.getPokemonList(this.pkmnPerPage, (this.page - 1) * this.pkmnPerPage)
+                .then(response => { return response.results; })
+            //this.numberOfPokemon = pokemonListResponse.length;
             console.log("numberOfPokemon: ", this.numberOfPokemon);
 
-            this.pokemonMap.clear();
             for (const pokemon of pokemonListResponse) {
                 try {
-                    // const pokemonData = await this.pokemonService.getPokemonSpecificData(pokemon.name);
-                    //
-                    // let sprites = pokemonData['sprites'];
-                    // let pokemonType = this.pokemonService.setThePokemonTypes(pokemonData);
-                    //
-                    // if (this.chosenType !== 'none' && !pokemonType.split('&').map(type => type.trim().toLowerCase()).includes(this.chosenType)) {
-                    //     //console.dir("Skipping " + pokemonData.name + " because its type: " + pokemonType + " doesn't match chosen type " + this.chosenType);
-                    //     continue;
-                    // }
-                    //
-                    // pokemonData['type'] = pokemonType;
-                    // let frontImg = sprites['front_default'];
-                    // pokemonData['showDefaultImage'] = frontImg != null;
-                    //
-                    // const speciesData = await this.pokemonService.getPokemonSpeciesData(pokemonData);
-                    // if (speciesData && 'color' in speciesData && speciesData.color && typeof speciesData.color === 'object' && 'name' in speciesData.color) {
-                    //     pokemonData['color'] = speciesData.color.name;
-                    // } else {
-                    //     pokemonData['color'] = 'white';
-                    // }
-                    //
-                    // // edit weight
-                    // let weight: string | number = pokemonData.weight.toString();
-                    // weight = weight.slice(0, -1) + '.' + weight.slice(-1);
-                    // weight = weight != null ? 10 * (Number.parseInt(weight) * 0.220462) : 0;
-                    // pokemonData.weight = weight;
-                    //
-                    // // edit height
-                    // let height: string | number = pokemonData.height.toString();
-                    // height = height != null ? Number.parseInt(height) * 3.93701 : 0;
-                    // pokemonData.height = height;
+                    const pokemonData = await this.pokemonService.getPokemonSpecificData(pokemon.name);
 
-                    this.pokemonMap.set(pokemon.id, pokemon);
+                    let sprites = pokemonData['sprites'];
+                    let pokemonType = this.pokemonService.setThePokemonTypes(pokemonData);
+
+                    if (this.chosenType !== 'none' && !pokemonType.split('&').map(type => type.trim().toLowerCase()).includes(this.chosenType)) {
+                        //console.dir("Skipping " + pokemonData.name + " because its type: " + pokemonType + " doesn't match chosen type " + this.chosenType);
+                        continue;
+                    }
+
+                    pokemonData['type'] = pokemonType;
+                    let frontImg = sprites['front_default'];
+                    pokemonData['showDefaultImage'] = frontImg != null;
+
+                    const speciesData = await this.pokemonService.getPokemonSpeciesData(pokemonData);
+                    if (speciesData && 'color' in speciesData && speciesData.color && typeof speciesData.color === 'object' && 'name' in speciesData.color) {
+                        pokemonData['color'] = speciesData.color.name;
+                    } else {
+                        pokemonData['color'] = 'white';
+                    }
+
+                    // edit weight
+                    let weight: string | number = pokemonData.weight.toString();
+                    weight = weight.slice(0, -1) + '.' + weight.slice(-1);
+                    weight = weight != null ? 10 * (Number.parseInt(weight) * 0.220462) : 0;
+                    pokemonData.weight = weight;
+
+                    // edit height
+                    let height: string | number = pokemonData.height.toString();
+                    height = height != null ? Number.parseInt(height) * 3.93701 : 0;
+                    pokemonData.height = height;
+
+                    this.pokemonMap.set(pokemonData.id, pokemonData);
                 } catch (error) {
                     console.error("Error fetching data for Pokemon: " + pokemon.name, error);
                 }

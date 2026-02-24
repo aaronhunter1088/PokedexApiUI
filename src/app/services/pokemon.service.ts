@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
-import {NamedAPIResourceList, Pokemon, PokemonSpecies} from "pokeapi-js-wrapper";
+import {NamedAPIResourceList, Pokedex, Pokemon, PokemonSpecies} from "pokeapi-js-wrapper";
 import {environment} from "../../environments/environment";
 
 @Injectable({
@@ -21,6 +21,15 @@ export class PokemonService
 
     getPokemonList(_limit: number, _offset: number): Promise<NamedAPIResourceList> {
         return this.callURL(this.hostUrl + "/pokemon?limit=" + _limit + "&offset=" + _offset);
+    }
+
+    async getTotalPokemon(pokedexId: string): Promise<number> {
+        const url = this.hostUrl + "/pokedex?pokedex=" + (pokedexId ?? "1");
+        console.log("Getting total Pokemon at: ", url);
+        const totalPokemon = await this.callURL(url).then((response => { return response; }));
+        // If the API returns an object with a 'pokemon' array:
+        console.log("Pokedex results: ", totalPokemon);
+        return totalPokemon;
     }
 
     async getPokemonSpecificData(pokemonName: string | number): Promise<Pokemon> {
@@ -70,16 +79,17 @@ export class PokemonService
         return pokemonList;
     }
 
-    async collectPokemonData() {
+    async collectPokemonData(numberOfPokemon: number) {
         console.log("Collecting Pokemon data...");
         let offset = (this.savedPageNumber - 1) * this.pkmnPerPage;
-        const limit = 1500;
+        const limit = numberOfPokemon;
+        //const limit = this.pkmnPerPage;
         if (this.allPokemon.length === 0) {
             let pokemonList = await this.getPokemonList(limit, offset)
                 .then((pokemonListData => { return pokemonListData }))
             let pokemon: Pokemon;
             let species: PokemonSpecies;
-            // @ts-ignore
+            console.log('Pokemon list results: ', pokemonList?.results?.length ?? 0);
             // @ts-ignore
             for (const p of pokemonList['results']) {
                 pokemon = <Pokemon>await this.getPokemonSpecificData(p.name).then((pokemonData => {
@@ -108,6 +118,7 @@ export class PokemonService
                     //if (height.length == 1) height = "0." + height
                     //else height = height.slice(0, -1) + '.' + height.slice(-1)
                     pokemon['height'] = Number(height);
+                    console.log('adding pokemon to allPokemon: ', pokemon.name);
                     this.allPokemon.push(pokemon);
                 } else {
                     console.error("Error fetching data for " + p.name + ": Pokemon or species data is undefined");
