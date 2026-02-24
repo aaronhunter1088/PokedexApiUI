@@ -24,11 +24,11 @@ export class PokemonService
     }
 
     async getTotalPokemon(pokedexId: string): Promise<number> {
-        const url = this.hostUrl + "/pokedex?pokedex=" + (pokedexId ?? "1");
-        console.log("Getting total Pokemon at: ", url);
+        const url = this.hostUrl + "/pokedex/" + (pokedexId ?? "1");
+        //console.log("Getting total Pokemon at: ", url);
         const totalPokemon = await this.callURL(url).then((response => { return response; }));
         // If the API returns an object with a 'pokemon' array:
-        console.log("Pokedex results: ", totalPokemon);
+        //console.log("Pokedex results: ", totalPokemon);
         return totalPokemon;
     }
 
@@ -152,7 +152,7 @@ export class PokemonService
     }
 
     async getPokemonChainData(pokemonChainID: string): Promise<object> {
-        return await this.callURL(this.hostUrl + "/evolution-chain/" + pokemonChainID);
+        return await this.callURL(this.hostUrl + "/evolution/evolution-chain/" + pokemonChainID);
     }
 
     getPokemonNamesThatEvolveFromTrading(): any {
