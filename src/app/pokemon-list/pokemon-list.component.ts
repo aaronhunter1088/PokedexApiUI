@@ -45,16 +45,16 @@ export class PokemonListComponent implements OnInit {
         this.pkmnPerPage = this.pokemonService.getNumberOfPokemonPerPage() // default is 10
         this.currentDarkMode = this.darkModeService.isDarkMode();
         this.showGifs = this.pokemonService.getShowGifs();
-        this.chosenType = this.pokemonService.getChosenType();
-        if (this.pokemonMap.size === 0 || this.chosenType !== 'none') {
-            // update pokemonMap by emptying it first.
-            this.pokemonMap.clear();
-            // @ts-ignore
-            if (!this.filteringInProgress.get(this.chosenType) && this.filteredPokemonByType.has(this.chosenType)) {
-                // @ts-ignore
-                await this.filterByType(this.chosenType)
-            }
-        }
+        // this.chosenType = this.pokemonService.getChosenType();
+        // if (this.pokemonMap.size === 0 || this.chosenType !== 'none') {
+        //     // update pokemonMap by emptying it first.
+        //     this.pokemonMap.clear();
+        //     // @ts-ignore
+        //     if (!this.filteringInProgress.get(this.chosenType) && this.filteredPokemonByType.has(this.chosenType)) {
+        //         // @ts-ignore
+        //         await this.filterByType(this.chosenType)
+        //     }
+        // }
 
         await this.pokemonService.getTotalPokemon("1").then(count => { this.numberOfPokemon = count; });
         console.log("loading numberOfPokemon: ", this.numberOfPokemon);
@@ -544,12 +544,12 @@ export class PokemonListComponent implements OnInit {
                     let weight: string | number = pokemonData.weight.toString();
                     weight = weight.slice(0, -1) + '.' + weight.slice(-1);
                     weight = weight != null ? 10 * (Number.parseInt(weight) * 0.220462) : 0;
-                    pokemonData.weight = weight;
+                    pokemonData.weight = Math.round(weight);
 
                     // edit height
                     let height: string | number = pokemonData.height.toString();
-                    height = height != null ? Number.parseInt(height) * 3.93701 : 0;
-                    pokemonData.height = height;
+                    height = height != null ? (Number.parseInt(height) * 3.93701) : 0;
+                    pokemonData.height = Math.round(Number(height));
 
                     this.pokemonMap.set(pokemonData.id, pokemonData);
                 } catch (error) {
