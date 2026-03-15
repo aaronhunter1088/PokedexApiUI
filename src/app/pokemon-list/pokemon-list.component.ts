@@ -43,32 +43,13 @@ export class PokemonListComponent implements OnInit {
     async ngOnInit(): Promise<void> {
         this.page = this.pokemonService.getSavedPage();
         this.pkmnPerPage = this.pokemonService.getNumberOfPokemonPerPage() // default is 10
+        this.getThePokemon().then(r =>
+            console.log("pokemonMap size: " + this.numberOfPokemon)
+        );
         this.currentDarkMode = this.darkModeService.isDarkMode();
         this.showGifs = this.pokemonService.getShowGifs();
-        // this.chosenType = this.pokemonService.getChosenType();
-        // if (this.pokemonMap.size === 0 || this.chosenType !== 'none') {
-        //     // update pokemonMap by emptying it first.
-        //     this.pokemonMap.clear();
-        //     // @ts-ignore
-        //     if (!this.filteringInProgress.get(this.chosenType) && this.filteredPokemonByType.has(this.chosenType)) {
-        //         // @ts-ignore
-        //         await this.filterByType(this.chosenType)
-        //     }
-        // }
-
-        await this.pokemonService.getTotalPokemon("1").then(count => { this.numberOfPokemon = count; });
-        console.log("loading numberOfPokemon: ", this.numberOfPokemon);
-        this.getThePokemon();
-        console.log("pokemonMap size: " + this.pokemonMap.size);
-        //this.pokemonService.collectPokemonData(this.numberOfPokemon);
-
         console.log("Dark mode is ", this.currentDarkMode);
         console.log("Show GIFs is ", this.showGifs);
-
-        // TODO: Fix. This is overloading the system.
-        // if (!this.retroactiveFetchingStarted) {
-        //     this.startRetroactiveFetchingByType();
-        // }
     }
 
     ngOnReload() {
@@ -92,45 +73,6 @@ export class PokemonListComponent implements OnInit {
         console.log('pkmnPerPage: ', this.pkmnPerPage);
         console.log('chosenType: ', this.chosenType);
         await this.gatherPokemon();
-        // TODO: Move logic into method for later re-use
-        // if (this.chosenType !== 'none') {
-        //     // @ts-ignore
-        //     if (this.filteredPokemonByType.has(this.chosenType) && this.filteredPokemonByType.get(this.chosenType)?.length >= this.pokemonService.pkmnPerPage) {
-        //         console.log('filtering not in progress');
-        //         let skipCount = (this.page - 1) * this.pkmnPerPage;
-        //         console.log("skipCount: " + skipCount);
-        //         let added = 0;
-        //         let typedList = this.filteredPokemonByType.get(this.chosenType);
-        //         if (typedList && typedList?.length >= this.pokemonService.pkmnPerPage) {
-        //             this.pokemonMap.clear();
-        //             for(let i = 0; i < typedList.length; i++) {
-        //                 if (i < skipCount) {
-        //                     // skip
-        //                 } else {
-        //                     if (added < this.pkmnPerPage) {
-        //                         let pkmn = typedList[i];
-        //                         console.debug("adding pkmn to pokemonMap: " + JSON.stringify(pkmn.name));
-        //                         this.pokemonMap.set(pkmn.id, pkmn);
-        //                         added++;
-        //                     }
-        //                 }
-        //                 if (this.pokemonMap.size === this.pkmnPerPage) break;
-        //             }
-        //         }
-        //         else {
-        //             await this.gatherPokemon();
-        //         }
-        //     }
-        //     else {
-        //
-        //         this.pokemonService.saveChosenType(this.chosenType);
-        //         await this.gatherPokemon();
-        //     }
-        // }
-        // else {
-        //     //this.pokemonMap = this.newMap();
-        //     await this.gatherPokemon();
-        // }
         this.blankPageNumber = '';
     }
 
@@ -142,6 +84,9 @@ export class PokemonListComponent implements OnInit {
         return new Map<number, any>();
     }
 
+    /**
+     * Gets the sprints for the Pokemon
+     */
     getPokemonSprites(pokemon: any) {
         //console.log(pokemon);
         let sprites = pokemon['sprites'];
@@ -511,13 +456,13 @@ export class PokemonListComponent implements OnInit {
     async gatherPokemon() {
         try {
             this.pokemonMap.clear();
+            const pokemonListResponse = await this.pokemonService
+                .getPokemonList(this.pkmnPerPage, (this.page - 1) * this.pkmnPerPage);
 
-            const pokemonListResponse = await this.pokemonService.getPokemonList(this.pkmnPerPage, (this.page - 1) * this.pkmnPerPage)
-                .then(response => { return response.results; })
-            //this.numberOfPokemon = pokemonListResponse.length;
+            this.numberOfPokemon = pokemonListResponse.count;
             console.log("numberOfPokemon: ", this.numberOfPokemon);
 
-            for (const pokemon of pokemonListResponse) {
+            for (const pokemon of pokemonListResponse.results) {
                 try {
                     const pokemonData = await this.pokemonService.getPokemonSpecificData(pokemon.name);
 

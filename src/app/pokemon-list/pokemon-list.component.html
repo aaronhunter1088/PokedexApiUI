@@ -104,8 +104,7 @@
                             <h3 id="idOfPokemon">ID: {{ pokemon.value.id }}</h3>
                         </div>
                         @for (sprites of getPokemonSprites(pokemon.value) | keyvalue; track sprites) {
-                            <div
-                                    id="image">
+                            <div id="image">
                                 @if (defaultImagePresent) {
                                     @if (sprites.key == 'front' && !showGifs) {
                                         <img (mouseout)="sprites.value = showFrontImage(pokemon.value);"
@@ -115,24 +114,18 @@
                                         >
                                     }
                                     @if (sprites.key == 'gif' && showGifs && gifImagePresent; ) {
-                                        <img
-                                                [src]="sprites.value" alt="{{pokemon.value.name}}-gif"
-                                        >
+                                        <img [src]="sprites.value" alt="{{pokemon.value.name}}-gif">
                                     }
                                     @if (sprites.key == 'official' && showGifs && !gifImagePresent; ) {
-                                        <img
-                                                [src]="sprites.value" alt="{{pokemon.value.name}}-official"
-                                        >
+                                        <img [src]="sprites.value" alt="{{pokemon.value.name}}-official">
                                     }
-                                } @else {
+                                }
+                                @else {
                                     @if (sprites.key == 'official' && sprites.value != null; ) {
-                                        <img
-                                                [src]="sprites.value" alt="{{pokemon.value.name}}-official"
-                                        >
+                                        <img [src]="sprites.value" alt="{{pokemon.value.name}}-official">
                                     }
                                     @if (sprites.key == 'official' && sprites.value == null; ) {
-                                        <img
-                                                alt="pokeball" src="assets/images/pokeball1.jpg">
+                                        <img src="assets/images/pokeball1.jpg" alt="pokeball">
                                     }
                                 }
                             </div>
