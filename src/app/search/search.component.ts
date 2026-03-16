@@ -51,86 +51,6 @@ export class SearchComponent implements OnInit {
         this.pokemonIDName = pokemonIDName;
     }
 
-    getPokemonInfo() {
-        this.isValidName(this.pokemonIDName);
-        this.pokemonDescription = '';
-        this.pokemonLocations = [];
-        this.pokemonMoves = [];
-        this.pokemonService.getPokemonSpecificData(this.pokemonIDName)
-            .then((pokemon: any) => {
-                //console.log("pokemon: ", pokemon);
-                this.pokemonName = pokemon.name;
-                //console.log("name: " + pokemon.name);
-                this.sprites = pokemon['sprites']//<object>pokemon['sprites'];
-                this.species = pokemon['species'];
-                //console.log("sprites", pokemon['sprites']);
-                this.pokemonImage = pokemon['sprites']['front_default'];
-                //this.pokemonImage = pokemon['sprites']['versions']['generation-v']['black-white']['animated'].front_default;
-                this.pokemonName = pokemon.name;
-                this.pokemonID = pokemon.id;
-                this.pokemonHeight = pokemon.height;
-                this.pokemonWeight = pokemon.weight;
-                // get and set color, and pokemon description
-                this.pokemonService.getPokemonSpeciesData(pokemon)
-                    .then((speciesData: any) => {
-                        //console.log("pokemon species: ", speciesData);
-                        this.pokemonColor = speciesData.color.name;
-                        this.setBackgroundColor();
-                        this.pokemonDescriptions = speciesData.flavor_text_entries;
-                        this.pokemonDescription = this.getEnglishDescriptions();
-                    })
-                    .catch((err: any) => {
-                        throw new Error('Something went wrong', err);
-                    });
-                // parse over the types
-                this.pokemonType = pokemon.types;
-                //console.log("pokemonType", pokemon.types);
-                if (this.pokemonType.length > 1) {
-                    // @ts-ignore
-                    this.pokemonType = this.pokemonType[0].type.name[0].toUpperCase() + this.pokemonType[0].type.name.substring(1) + " and " + this.pokemonType[1].type.name[0].toUpperCase() + this.pokemonType[1].type.name.substring(1);
-                } else {
-                    // @ts-ignore
-                    this.pokemonType = this.pokemonType[0].type.name[0].toUpperCase() + this.pokemonType[0].type.name.substring(1);
-                }
-                // locations
-                this.pokemonService.getPokemonLocationEncounters(pokemon.location_area_encounters)
-                    .then((locations: any) => {
-                        if (locations.length == 0) {
-                            this.pokemonLocations.push("No known locations!");
-                        } else {
-                            locations.forEach((location: any) => {
-                                let names = location?.location_area?.name.split("-")
-                                names.forEach((name: string) => {
-                                    name = name[0].toUpperCase() + name.substring(1);
-                                    this.pokemonLocations.push(name + " ");
-                                });
-                            });
-                            this.pokemonLocations.sort();
-                        }
-                    })
-                    .catch((error: any) => {
-                        throw new Error('Something went wrong', error);
-                    })
-                // moves
-                let allMoves = pokemon['moves'];
-                //console.log("all moves: ");
-                //console.log(allMoves);
-                for (let i = 0; i < allMoves.length; i++) {
-                    //console.log("move: ");
-                    //console.log(allMoves[i]['move'].name);
-                    let move = allMoves[i]['move'].name;
-                    move = move[0].toUpperCase() + move.substring(1);
-                    this.pokemonMoves.push(move);
-                }
-                this.pokemonMoves.sort();
-            })
-            .catch((error: any) => {
-                console.log("Couldn't get Pokemon info with: '" + this.pokemonIDName + "'");
-                console.log(error);
-            });
-        this.pokemonIDName = '';
-    }
-
     isValidName(nameOrId: string) {
         this.pokemonIDName = nameOrId.toLowerCase();
         this.pokemonService.getPokemonSpecificData(this.pokemonIDName)
@@ -182,6 +102,116 @@ export class SearchComponent implements OnInit {
         }
     }
 
+    async navigateToPokedex(): Promise<void> {
+        let idElement = document.getElementById('pokemonNameIDInput') as HTMLInputElement;
+        let pokemonId = idElement?.value?.toLowerCase()?.trim();
+        if (!pokemonId) {
+            alert('Please enter a valid pokemon name');
+            return;
+        }
+        const idPattern = /^[1-9][0-9]{0,3}$/; // Matches numbers from 1 to 9999
+        const isNumeric = /^\d+$/.test(pokemonId);
+
+        if (isNumeric) {
+            if (!idPattern.test(pokemonId)) {
+                alert("Please enter a valid Pokemon ID (1-9999)");
+                return;
+            }
+        }
+        // if a name is entered, validate it and get the id
+        let pokemon = this.pokemonService.getPokemonByName(pokemonId);
+        if (pokemon) {
+            pokemonId = await pokemon.then(pkmn => {
+                return pkmn.id.toString();
+            });
+        } else {
+            alert("Please enter a valid Pokemon ID (1-9999)");
+            return;
+        }
+        console.log("searched for pokemonId: " + pokemonId);
+        this.router.navigate(['pokedex', pokemonId])
+            .then(() => {
+                // Clear the search input after navigation
+                this.pokemonIDName = '';
+            });
+    }
+
+    getPokemonInfo() {
+        this.isValidName(this.pokemonIDName);
+        this.pokemonDescription = '';
+        this.pokemonLocations = [];
+        this.pokemonMoves = [];
+        this.pokemonService.getPokemonByName(this.pokemonIDName)
+            .then((pokemon: any) => {
+                //console.log("pokemon: ", pokemon);
+                this.pokemonName = pokemon.name;
+                //console.log("name: " + pokemon.name);
+                this.sprites = pokemon['sprites']//<object>pokemon['sprites'];
+                this.species = pokemon['species'];
+                //console.log("sprites", pokemon['sprites']);
+                this.pokemonImage = pokemon['sprites']['front_default'];
+                //this.pokemonImage = pokemon['sprites']['versions']['generation-v']['black-white']['animated'].front_default;
+                this.pokemonName = pokemon.name;
+                this.pokemonID = pokemon.id;
+                this.pokemonHeight = pokemon.height;
+                this.pokemonWeight = pokemon.weight;
+                // get and set color, and pokemon description
+                this.pokemonService.getPokemonSpeciesData(pokemon)
+                    .then((speciesData: any) => {
+                        //console.log("pokemon species: ", speciesData);
+                        this.pokemonColor = speciesData['color']['name'];
+                        this.pokemonDescriptions = speciesData.flavor_text_entries;
+                        this.pokemonDescription = this.getEnglishDescriptions();
+                    }); //.subscribe
+                // parse over the types
+                this.pokemonType = pokemon.types;
+                //console.log("pokemonType", pokemon.types);
+                if (this.pokemonType.length > 1) {
+                    // @ts-ignore
+                    this.pokemonType = this.pokemonType[0].type.name[0].toUpperCase() + this.pokemonType[0].type.name.substring(1) + " and " + this.pokemonType[1].type.name[0].toUpperCase() + this.pokemonType[1].type.name.substring(1);
+                } else {
+                    // @ts-ignore
+                    this.pokemonType = this.pokemonType[0].type.name[0].toUpperCase() + this.pokemonType[0].type.name.substring(1);
+                }
+                // locations
+                this.pokemonService.getPokemonLocationEncounters(this.pokemonID).then(
+                    (locations: any) => {
+                        if (locations.length == 0) {
+                            this.pokemonLocations.push("No known locations!");
+                        } else {
+                            locations.forEach((location: any) => {
+                                let names = location['location_area']['name'].split("-")
+                                let newName = '';
+                                names.forEach((name: string) => {
+                                    name = name[0].toUpperCase() + name.substring(1);
+                                    newName += name + " ";
+                                    //console.log(newName);
+                                });
+                                this.pokemonLocations.push(newName);
+                            });
+                            this.pokemonLocations.sort();
+                        }
+                    });
+                // moves
+                let allMoves = pokemon['moves'];
+                //console.log("all moves: ");
+                //console.log(allMoves);
+                for (let i = 0; i < allMoves.length; i++) {
+                    //console.log("move: ");
+                    //console.log(allMoves[i]['move'].name);
+                    let move = allMoves[i]['move'].name;
+                    move = move[0].toUpperCase() + move.substring(1);
+                    this.pokemonMoves.push(move);
+                }
+                this.pokemonMoves.sort();
+            })
+            .catch((error: any) => {
+                console.log("Couldn't get Pokemon info with: '" + this.pokemonIDName + "'");
+                console.log(error);
+            });
+        this.pokemonIDName = '';
+    }
+
     getEnglishDescriptions() {
         let englishDescriptions: any = [];
         for (let i = 0; i < this.pokemonDescriptions.length; i++) {
@@ -201,33 +231,5 @@ export class SearchComponent implements OnInit {
         }
         //console.log(this.pokemonDescription);
         return this.pokemonDescription
-    }
-
-    async navigateToPokedex(): Promise<void> {
-        let pokemonId = this.pokemonIDName;
-        const idPattern = /^[1-9][0-9]{0,3}$/; // Matches numbers from 1 to 9999
-        const isNumeric = /^\d+$/.test(pokemonId);
-
-        if (isNumeric) {
-            if (!idPattern.test(pokemonId)) {
-                alert("Please enter a valid Pokemon ID (1-9999)");
-                return;
-            }
-        }
-        // if a name is entered, validate it and get the id
-        if (pokemonId !== undefined) {
-            let pokemon = this.pokemonService.getPokemonByName(pokemonId);
-            if (pokemon) {
-                pokemonId = await pokemon.then(pkmn => {
-                    return pkmn.id.toString();
-                });
-            }
-        }
-        console.log("searched for pokemonId: " + pokemonId);
-        this.router.navigate(['pokedex', pokemonId])
-            .then(() => {
-                // Clear the search input after navigation
-                this.pokemonIDName = '';
-            });
     }
 }
