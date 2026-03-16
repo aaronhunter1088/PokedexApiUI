@@ -145,9 +145,10 @@ export class PokemonListComponent implements OnInit {
     }
 
     setNewPageNumberMobile(newPage: number) {
-        this.setNewPageNumber(String(newPage));
+        this.setPageToView(String(newPage));
     }
-    setNewPageNumber(newPage: string) {
+
+    setPageToView(newPage: string) {
         let chosenPage = Number.parseInt(newPage)
         if (chosenPage < 0) {
             alert("Page number cannot be negative")
