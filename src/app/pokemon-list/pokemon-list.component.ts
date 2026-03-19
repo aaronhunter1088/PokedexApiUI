@@ -19,10 +19,10 @@ export class PokemonListComponent implements OnInit {
     pkmnPerPage: number = this.pokemonService.pkmnPerPage;
     numberOfPokemon: number = 0;
     defaultImagePresent: boolean = false;
-    showGifs: boolean = false;
+    showGifs: boolean = this.pokemonService.getShowGifs();
     gifImagePresent: boolean = false;
     landingPageUrl: string = environment.landingPageUrl;
-    currentDarkMode: boolean = false;
+    currentDarkMode: boolean = this.darkModeService.isDarkMode();
     pokemonIDName: string = '';
     chosenType: string = this.pokemonService.getChosenType();
     uniqueTypes: string[] = ["bug", "dark", "dragon", "electric", "fairy", "fighting",
