@@ -137,6 +137,7 @@ export class MobileMenuComponent implements OnInit {
     toggleDarkmode() {
         let updatedDarkmode = !this.darkModeService.isDarkMode();
         this.currentDarkModeChange.emit(updatedDarkmode);
+        this.closeMobileMenu();
         setTimeout(() => {
             const url = new URL(window.location.href);
             url.searchParams.set('darkmode', String(updatedDarkmode));
