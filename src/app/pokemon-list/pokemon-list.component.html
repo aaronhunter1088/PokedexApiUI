@@ -25,15 +25,14 @@
 <div class="desktop-controls"
      [style.color]="currentDarkMode ? '#ffffff' : '#000000'"
      style="display:flex; justify-content: center; align-items: center; gap: 15px; padding-bottom:10px;">
-    <mat-slide-toggle (click)="showGifs = !showGifs; pokemonService.saveShowGifs(showGifs);"
+    <mat-slide-toggle (click)="toggleShowGifs();"
                       title="If GIF is not present, official artwork will show!"
-                      [class]="currentDarkMode?'darkmode':'lightmode'">
+                      [checked]="showGifs">
         Show GIFs
     </mat-slide-toggle>
     <mat-slide-toggle [checked]="getCurrentDarkMode()"
                       (click)="toggleDarkMode()"
-                      title="Toggle darkmode"
-                      [class]="currentDarkMode?'darkmode':'lightmode'">
+                      title="Toggle darkmode">
         {{currentDarkMode? 'Dark Mode On' : 'Light Mode On'}}
     </mat-slide-toggle>
     <div style="display:flex; align-items: center; gap: 5px;">
@@ -44,7 +43,7 @@
             [value]="pokemonIDName"
             autofocus
             placeholder="Name or ID"
-            style="height:50px; width:150px; font-size: 15px;"
+            style="width:150px; font-size: 15px;"
             tabindex="0"
             type="text"/>
         <img alt="Get Pokémon"
@@ -54,7 +53,8 @@
              (click)="navigateToPokedex();">
     </div>
     <div style="display:flex; align-items: center; gap: 5px;">
-        <input #pageNumber (keydown.enter)="setPageToView(pageNumber.value); pageNumber.value = '';"
+        <input #pageNumber
+               (keydown.enter)="setPageToView(pageNumber.value); pageNumber.value = '';"
                placeholder="Page #"
                style="width:60px;"
                type="text"/>
@@ -65,13 +65,13 @@
         </i>
     </div>
     <div style="display:flex; align-items: center; gap: 5px;">
-        <input #showNPokemon (keydown.enter)="setNumberOfPokemonToDisplay(showNPokemon.value); showNPokemon.value = '';"
+        <input #showNPokemon
+               (keydown.enter)="setNumberOfPokemonToDisplay(showNPokemon.value); showNPokemon.value = '';"
                placeholder="# of PkMn"
                style="width:70px;"
                type="text"/>
         <i class="fa-regular fa-circle-right" style="font-size:30px; cursor:pointer;"
            (click)="setNumberOfPokemonToDisplay(showNPokemon.value); showNPokemon.value = '';"
-           [style.color]="currentDarkMode ? '#ffffff' : '#000000'"
            title="Show Pokémon">
         </i>
     </div>
@@ -82,7 +82,7 @@
 </div>
 
 <pagination-controls
-        (pageChange)="this.page=$event; getThePokemon();"
+        (pageChange)="this.page=$event; pokemonMap = newMap(); getThePokemon();"
         [maxSize]="this.pkmnPerPage"
         style="justify-content: space-evenly;">
 </pagination-controls>
@@ -109,7 +109,8 @@
                             <h3 id="idOfPokemon">ID: {{ pokemon.value.id }}</h3>
                         </div>
                         @for (sprites of getPokemonSprites(pokemon.value) | keyvalue; track sprites) {
-                            <div id="image">
+                            <div
+                                    id="image">
                                 @if (defaultImagePresent) {
                                     @if (sprites.key == 'front' && !showGifs) {
                                         <img (mouseout)="sprites.value = showFrontImage(pokemon.value);"
@@ -148,6 +149,6 @@
     }
 </div>
 <pagination-controls
-        (pageChange)="this.page=$event; getThePokemon();"
+        (pageChange)="this.page=$event; pokemonMap = newMap(); getThePokemon();"
         [maxSize]="this.pkmnPerPage"
         style="justify-content: space-evenly;"></pagination-controls>

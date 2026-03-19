@@ -189,11 +189,13 @@ export class PokemonListComponent implements OnInit {
         window.location.href = url;
     }
 
+    toggleShowGifs() {
+        this.showGifs = !this.showGifs;
+        this.pokemonService.saveShowGifs(this.showGifs);
+    }
+
     toggleDarkMode(): void {
         this.darkModeService.toggleDarkMode();
-        const url = new URL(window.location.href);
-        url.searchParams.set('darkmode', this.darkModeService.isDarkMode().toString());
-        setTimeout(() => window.location.href = url.toString(), 100);
     }
 
     getCurrentDarkMode(): boolean {
