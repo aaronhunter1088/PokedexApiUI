@@ -157,7 +157,7 @@ app-mobile-menu .mobile-menu-overlay {
         min-height: 70px;
     }
 
-    app-mobile-menu .mobile-header .darkmode {
+    app-mobile-menu .mobile-header.darkmode {
         background-color: black;
         color: white;
     }
@@ -308,4 +308,3 @@ app-mobile-menu .mobile-menu-overlay {
         display: none !important;
     }
 }
-

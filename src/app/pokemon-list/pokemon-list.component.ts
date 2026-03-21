@@ -196,6 +196,7 @@ export class PokemonListComponent implements OnInit {
 
     toggleDarkMode(): void {
         this.darkModeService.toggleDarkMode();
+        this.currentDarkMode = this.darkModeService.isDarkMode();
     }
 
     getCurrentDarkMode(): boolean {

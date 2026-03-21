@@ -93,8 +93,7 @@
         currentPage: this.page,
         totalItems: this.numberOfPokemon
     }; track pokemon) {
-        <div
-        >
+        <div>
             <nav>
                 <a [routerLink]="['/pokedex', pokemon.value.id]" style="text-decoration: none; color: black;">
                     <div [ngStyle]="{'background-color':changeColor(pokemon.value.color)}" class="box"
@@ -116,8 +115,7 @@
                                         <img (mouseout)="sprites.value = showFrontImage(pokemon.value);"
                                              (mouseover)="sprites.value = showOfficialArtwork(pokemon.value)"
                                              [src]="sprites.value"
-                                             alt="{{pokemon.value.name}}-default"
-                                        >
+                                             alt="{{pokemon.value.name}}-default">
                                     }
                                     @if (sprites.key == 'gif' && showGifs && gifImagePresent; ) {
                                         <img [src]="sprites.value" alt="{{pokemon.value.name}}-gif">

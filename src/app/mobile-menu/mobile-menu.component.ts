@@ -18,8 +18,8 @@ import {MatSlideToggleModule} from "@angular/material/slide-toggle";
     styleUrl: './mobile-menu.component.css',
 })
 export class MobileMenuComponent implements OnInit {
-    @Input() showGifs: boolean = false;
-    @Input() currentDarkMode: boolean = false;
+    @Input() showGifs: boolean = this.pokemonService.getShowGifs();
+    @Input() currentDarkMode: boolean = this.darkModeService.isDarkMode();
     @Input() pokemonMap: Map<number, any> = new Map<number, any>();
     @Output() showGifsChange = new EventEmitter<boolean>();
     @Output() currentDarkModeChange = new EventEmitter<boolean>();
@@ -136,6 +136,7 @@ export class MobileMenuComponent implements OnInit {
 
     toggleDarkMode() {
         this.darkModeService.toggleDarkMode();
+        this.currentDarkMode = this.darkModeService.isDarkMode();
         setTimeout(() => {
             this.closeMobileMenu();
         }, 500);
