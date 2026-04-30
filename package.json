@@ -4,10 +4,10 @@
   "scripts": {
     "ng": "ng",
     "npx": "npx",
-    "start": "ng serve",
-    "startPort": "ng serve --host 0.0.0.0",
-    "build": "ng build",
-    "build-server": "ng build --base-href /combined/ --deploy-url /combined/",
+    "startCombinedApp": "ng serve",
+    "startCombinedAppAndMobile": "ng serve --host 0.0.0.0",
+    "installCombinedApp": "npm install",
+    "deployCombinedAppForServer": "ng build --base-href /combined/ --deploy-url /combined/",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
