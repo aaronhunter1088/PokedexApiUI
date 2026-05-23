@@ -78,6 +78,9 @@ export class MobileMenuComponent implements OnInit {
                 alert("Please enter a valid Pokemon ID (1-9999)");
                 return;
             }
+        } else if (!pokemonId) {
+            alert('Pok\u00e9mon not found. Please check the Name and try again.');
+            return;
         }
         if (pokemonId === 'deoxys') {
             pokemonId = 'deoxys-normal';
