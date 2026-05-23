@@ -79,13 +79,18 @@ export class MobileMenuComponent implements OnInit {
                 return;
             }
         }
-        // if a name is entered, validate it and get the id
+        if (pokemonId === 'deoxys') {
+            pokemonId = 'deoxys-normal';
+        }
         if (pokemonId !== undefined) {
             let pokemon = this.pokemonService.getPokemonByName(pokemonId);
             if (pokemon) {
                 pokemonId = await pokemon.then(pkmn => {
                     return pkmn.id.toString();
                 });
+            } else if (!pokemon) {
+                alert('Pok\u00e9mon not found. Please check the Name and try again.');
+                return;
             }
         }
         console.log("searched for pokemonId: " + pokemonId);
@@ -161,7 +166,7 @@ export class MobileMenuComponent implements OnInit {
      */
     navigateToLandingPage(): void {
         const currentDarkMode = this.darkModeService.isDarkMode();
-        const url = this.landingPageUrl + "?tileNumber=2&darkmode="+currentDarkMode;
+        const url = this.landingPageUrl + "?tileNumber=3&darkmode="+currentDarkMode;
         window.location.href = url;
     }
 
